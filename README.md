@@ -1,1 +1,1 @@
-# Flight-Managger
+# Flight-Manager
