@@ -105,29 +105,29 @@ class TestUIHandler {
 		// This flight is supposed to remain at the end of the test.
 		Flight testFlight1 = new IncomingFlight("Elal", "LY1", "New York", LocalDateTime.of(2020, 05, 20, 00, 45), 3);
 		// These flights is supposed to be filtered by time.
-		Flight testFlightFilteredAfter = new IncomingFlight("Elal", "LY1", "New York",
+		Flight testFlight2FilteredAfter = new IncomingFlight("Elal", "LY1", "New York",
 				LocalDateTime.of(2022, 11, 10, 00, 45), 3);
-		Flight testFlightFilteredBefore = new IncomingFlight("Elal", "LY1", "New York",
+		Flight testFlight3FilteredBefore = new IncomingFlight("Elal", "LY1", "New York",
 				LocalDateTime.of(2020, 05, 10, 00, 45), 3);
 		// This flight is filtered by Airline.
-		Flight testFlightFilteredByAirline = new IncomingFlight("Turkish", "LY1", "New York",
+		Flight testFlight4FilteredByAirline = new IncomingFlight("Turkish", "LY1", "New York",
 				LocalDateTime.of(2021, 06, 15, 00, 45), 3);
 		// This flight is filtered by City.
-		Flight testFlightFilteredByCity = new IncomingFlight("Elal", "LY1", "London",
+		Flight testFlight5FilteredByCity = new IncomingFlight("Elal", "LY1", "London",
 				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
 		// This flight is filtered by Terminal.
-		Flight testFlightFilteredByTerminal = new IncomingFlight("Elal", "LY1", "New York",
+		Flight testFlight6FilteredByTerminal = new IncomingFlight("Elal", "LY1", "New York",
 				LocalDateTime.of(2020, 05, 20, 00, 45), 1);
 		// This flight is filtered by Direction.
-		Flight testFlightFilteredByDirection = new OutgoingFlight("Elal", "LY1", "New York",
+		Flight testFlight7FilteredByDirection = new OutgoingFlight("Elal", "LY1", "New York",
 				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
 		handler.addFlight(testFlight1);
-		handler.addFlight(testFlightFilteredAfter);
-		handler.addFlight(testFlightFilteredBefore);
-		handler.addFlight(testFlightFilteredByAirline);
-		handler.addFlight(testFlightFilteredByCity);
-		handler.addFlight(testFlightFilteredByTerminal);
-		handler.addFlight(testFlightFilteredByDirection);
+		handler.addFlight(testFlight2FilteredAfter);
+		handler.addFlight(testFlight3FilteredBefore);
+		handler.addFlight(testFlight4FilteredByAirline);
+		handler.addFlight(testFlight5FilteredByCity);
+		handler.addFlight(testFlight6FilteredByTerminal);
+		handler.addFlight(testFlight7FilteredByDirection);
 		String input = "3\n2020\n5\n16\n0\n0\n2022\n10\n10\n0\n0\nY\nElal\nY\nNew York\nY\n3\n1";
 		Scanner scanner = new Scanner(input);
 
@@ -136,7 +136,8 @@ class TestUIHandler {
 			System.out.println(flight);
 		}
 		ArrayList<Flight> expectedList = new ArrayList<>();
-		assertTrue(expectedList.equals(testList));
+		expectedList.add(testFlight1);
+		assertEquals(expectedList, testList);
 	}
 
 }

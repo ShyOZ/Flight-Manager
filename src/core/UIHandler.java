@@ -8,6 +8,7 @@ import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
@@ -136,8 +137,8 @@ public class UIHandler {
 	}
 
 	public ArrayList<Flight> filteringFlightMenu(Scanner scanner) {
-		// Function that recives a list of all flights here
-		ArrayList<Flight> flightList = new ArrayList<>(allFlights);
+		// Function that receives a list of all flights here
+		List<Flight> flightList = new ArrayList<>(allFlights);
 		System.out.println("Would you like to filter by Time?");
 		System.out.println("0: No");
 		System.out.println("1: All flights before a certain date");
@@ -147,11 +148,11 @@ public class UIHandler {
 		switch (choice) {
 		case 1:
 			System.out.println("Before what time?");
-			filterFlightsBefore(flightList, dateTimeBuilder(scanner));
+			flightList = filterFlightsBefore(flightList, dateTimeBuilder(scanner));
 			break;
 		case 2:
 			System.out.println("After what time?");
-			filterFlightsAfter(flightList, dateTimeBuilder(scanner));
+			flightList = filterFlightsAfter(flightList, dateTimeBuilder(scanner));
 			break;
 		case 3:
 			System.out.println("After what time?");
@@ -161,8 +162,8 @@ public class UIHandler {
 				System.out.println("Before what time?");
 				earlierThan = dateTimeBuilder(scanner);
 			} while (laterThan.isAfter(earlierThan));
-			filterFlightsBefore(flightList, earlierThan);
-			filterFlightsAfter(flightList, laterThan);
+			flightList = filterFlightsBefore(flightList, earlierThan);
+			flightList = filterFlightsAfter(flightList, laterThan);
 			break;
 		}
 		boolean answer = (getValidString(Y_N_QUESTION, "Would you like to filter by airline? [Y|N]", scanner)
@@ -170,20 +171,20 @@ public class UIHandler {
 		if (answer) {
 			// In this case, user wants to filter by Airline
 			String name = getValidString(VALID_NAME, "Enter Airline Name (Letters only): ", scanner);
-			filterByAirline(name, flightList, scanner);
+			flightList = filterByAirline(name, flightList, scanner);
 		}
 		answer = (getValidString(Y_N_QUESTION, "Would you like to filter by city? [Y|N]", scanner)
 				.equalsIgnoreCase("Y"));
 		if (answer) {
 			// In this case, user wants to filter by City
 			String name = getValidString(VALID_NAME, "Enter City Name (Letters only): ", scanner);
-			filterByCity(name, flightList, scanner);
+			flightList = filterByCity(name, flightList, scanner);
 		}
 		answer = (getValidString(Y_N_QUESTION, "Would you like to filter by terminal? [Y|N]", scanner)
 				.equalsIgnoreCase("Y"));
 		if (answer) {
 			choice = getValidInt(1, numOfTerminals, "Enter terminal number: ", scanner);
-			filterByTerminal(choice, flightList, scanner);
+			flightList = filterByTerminal(choice, flightList, scanner);
 		}
 		System.out.println("Would you like to filter by Direction?");
 		System.out.println("0: No");
@@ -192,46 +193,42 @@ public class UIHandler {
 		choice = getValidInt(0, 2, "Enter your choice ", scanner);
 		switch (choice) {
 		case 1:
-			filterByInOut(flightList, IncomingFlight.class, scanner);
+			flightList = filterByInOut(flightList, IncomingFlight.class, scanner);
 			break;
 		case 2:
-			filterByInOut(flightList, OutgoingFlight.class, scanner);
+			flightList = filterByInOut(flightList, OutgoingFlight.class, scanner);
 			break;
 		}
-		return flightList;
+		return (ArrayList<Flight>) flightList;
 	}
 
-	private <T extends Flight> void filterByInOut(ArrayList<Flight> flightList, Class<T> class1, Scanner scanner) {
-		flightList = (ArrayList<Flight>) flightList.stream().filter(flight -> flight.getClass().equals(class1))
+	private List<Flight> filterByInOut(List<Flight> flightList, Class<? extends Flight> flightType, Scanner scanner) {
+		return flightList.stream().filter(flight -> flight.getClass().equals(flightType)).collect(Collectors.toList());
+	}
+
+	private List<Flight> filterByTerminal(int choice, List<Flight> flightList, Scanner scanner) {
+		return flightList.stream().filter(flight -> flight.getTerminal() == choice).collect(Collectors.toList());
+
+	}
+
+	private List<Flight> filterByCity(String name, List<Flight> flightList, Scanner scanner) {
+		return flightList.stream().filter(flight -> flight.getCity().equalsIgnoreCase(name))
 				.collect(Collectors.toList());
 	}
 
-	private void filterByTerminal(int choice, ArrayList<Flight> flightList, Scanner scanner) {
-		flightList = (ArrayList<Flight>) flightList.stream().filter(flight -> flight.getTerminal() == choice)
-				.collect(Collectors.toList());
-
-	}
-
-	private void filterByCity(String name, ArrayList<Flight> flightList, Scanner scanner) {
-		flightList = (ArrayList<Flight>) flightList.stream().filter(flight -> flight.getCity().equalsIgnoreCase(name))
+	private List<Flight> filterByAirline(String name, List<Flight> flightList, Scanner scanner) {
+		return flightList.stream().filter(flight -> flight.getAirline().equalsIgnoreCase(name))
 				.collect(Collectors.toList());
 	}
 
-	private void filterByAirline(String name, ArrayList<Flight> flightList, Scanner scanner) {
-		flightList = (ArrayList<Flight>) flightList.stream()
-				.filter(flight -> flight.getAirline().equalsIgnoreCase(name)).collect(Collectors.toList());
-	}
-
-	private void filterFlightsBefore(ArrayList<Flight> flightList, LocalDateTime dateTimeBuilder) {
-		flightList = (ArrayList<Flight>) flightList.stream()
-				.filter(flight -> ((flight.getFlightTime()).compareTo(dateTimeBuilder) <= 0))
+	private List<Flight> filterFlightsBefore(List<Flight> flightList, LocalDateTime dateTimeBuilder) {
+		return flightList.stream().filter(flight -> flight.getFlightTime().compareTo(dateTimeBuilder) <= 0)
 				.collect(Collectors.toList());
 
 	}
 
-	private void filterFlightsAfter(ArrayList<Flight> flightList, LocalDateTime dateTimeBuilder) {
-		flightList = (ArrayList<Flight>) flightList.stream()
-				.filter(flight -> ((flight.getFlightTime()).compareTo(dateTimeBuilder) >= 0))
+	private List<Flight> filterFlightsAfter(List<Flight> flightList, LocalDateTime dateTimeBuilder) {
+		return flightList.stream().filter(flight -> flight.getFlightTime().compareTo(dateTimeBuilder) >= 0)
 				.collect(Collectors.toList());
 
 	}
