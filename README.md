@@ -1,2 +1,2 @@
 # Flight-Manager
-By Ori,Natty and Shay.
+By Ori, Natty and Shy.
