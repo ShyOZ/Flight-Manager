@@ -6,10 +6,12 @@ import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class UIHandler {
 	// Fields
@@ -18,6 +20,10 @@ public class UIHandler {
 	private TreeSet<Flight> outgoingFlights = new TreeSet<>();
 	private int numOfTerminals;
 	private final int BASE_NUM_OF_TERMINALS = 3;
+	private final String VALID_NAME = "[a-zA-Z ]+";
+	private final String VALID_FLIGHTNUMBER = "(^([A-Z]{0,3})([0-9]{1,4})$)";
+	private final String Y_N_QUESTION = "Y|N";
+	private final String IN_OR_OUT = "IN|OUT";
 
 	// Properties (Getters and Setters)
 
@@ -45,7 +51,7 @@ public class UIHandler {
 
 	// Constructors
 	public UIHandler() {
-		this(0);
+		this(3);
 	}
 
 	public UIHandler(int numOfTerminals) {
@@ -57,10 +63,11 @@ public class UIHandler {
 		System.out.println("========== MENU ==========");
 		System.out.println("1: Add a new Flight");
 		System.out.println("2: Show all Flights");
-		System.out.println("3: Show all incoming flights");
-		System.out.println("4: Show all outgoing flights");
-		System.out.println("5: Save to file");
-//		System.out.println("6: Load from file");
+//		System.out.println("3: Show all incoming flights");
+		System.out.println("3: Show wanted flight");
+//		System.out.println("4: Show all outgoing flights");
+		System.out.println("4: Save to file");
+		System.out.println("5: Load from file");
 //		System.out.println("7: Remove a flight");
 		System.out.println("0: EXIT");
 		System.out.println("========== MENU ==========");
@@ -86,18 +93,19 @@ public class UIHandler {
 		String city;
 		int terminal;
 
-		airline = getValidString("[a-zA-Z ]+", "Enter airline's name (letters and spaces only)", scanner);
+		airline = getValidString(VALID_NAME, "Enter airline's name (letters and spaces only)", scanner);
 
-		flightNumber = getValidString("[A-Z0-9]+", "Enter flight number (capital letters and numbers only)", scanner);
+		flightNumber = getValidString(VALID_FLIGHTNUMBER, "Enter flight number (capital letters and numbers only)",
+				scanner);
 
 		System.out.println("Enter the time of departure");
 		flightTime = dateTimeBuilder(scanner);
 
-		incoming = (getValidString("IN|OUT", "Is the flight [IN] incoming or [OUT] outgoing?", scanner)
+		incoming = (getValidString(IN_OR_OUT, "Is the flight [IN] incoming or [OUT] outgoing?", scanner)
 				.equalsIgnoreCase("IN"));
 		city = incoming ? "origin" : "destination";
 
-		city = getValidString("[a-zA-z ]+", String.format("Enter %s city (letters and spaces only)", city), scanner);
+		city = getValidString(VALID_NAME, String.format("Enter %s city (letters and spaces only)", city), scanner);
 		terminal = getValidInt(1, numOfTerminals, "Enter terminal number", scanner);
 		scanner.nextLine();
 		return (incoming) ? new IncomingFlight(airline, flightNumber, city, flightTime, terminal)
@@ -117,14 +125,115 @@ public class UIHandler {
 
 	private LocalDateTime dateTimeBuilder(Scanner scanner) {
 		while (true) {
-			int year = getValidInt(2000, 2030, "On what year is the flight?", scanner);
-			int month = getValidInt(1, 12, "On what month is the flight?", scanner);
+			int year = getValidInt(2000, 2030, "What year?", scanner);
+			int month = getValidInt(1, 12, "What month?", scanner);
 			int maxDayInMonth = YearMonth.of(year, month).lengthOfMonth();
-			int day = getValidInt(1, maxDayInMonth, "On what day is the flight?", scanner);
-			int hour = getValidInt(0, 23, "On what hour is the flight?", scanner);
-			int min = getValidInt(0, 59, "On what minute is the flight?", scanner);
+			int day = getValidInt(1, maxDayInMonth, "On what day?", scanner);
+			int hour = getValidInt(0, 23, "At what hour?", scanner);
+			int min = getValidInt(0, 59, "At what minute?", scanner);
 			return LocalDateTime.of(year, month, day, hour, min);
 		}
+	}
+
+	public ArrayList<Flight> filteringFlightMenu(Scanner scanner) {
+		// Function that recives a list of all flights here
+		ArrayList<Flight> flightList = new ArrayList<>(allFlights);
+		System.out.println("Would you like to filter by Time?");
+		System.out.println("0: No");
+		System.out.println("1: All flights before a certain date");
+		System.out.println("2: All flights after a certain date");
+		System.out.println("3: All flights in a certain range");
+		int choice = getValidInt(0, 3, "Enter your choice", scanner);
+		switch (choice) {
+		case 1:
+			System.out.println("Before what time?");
+			filterFlightsBefore(flightList, dateTimeBuilder(scanner));
+			break;
+		case 2:
+			System.out.println("After what time?");
+			filterFlightsAfter(flightList, dateTimeBuilder(scanner));
+			break;
+		case 3:
+			System.out.println("After what time?");
+			LocalDateTime laterThan = dateTimeBuilder(scanner);
+			LocalDateTime earlierThan;
+			do {
+				System.out.println("Before what time?");
+				earlierThan = dateTimeBuilder(scanner);
+			} while (laterThan.isAfter(earlierThan));
+			filterFlightsBefore(flightList, earlierThan);
+			filterFlightsAfter(flightList, laterThan);
+			break;
+		}
+		boolean answer = (getValidString(Y_N_QUESTION, "Would you like to filter by airline? [Y|N]", scanner)
+				.equalsIgnoreCase("Y"));
+		if (answer) {
+			// In this case, user wants to filter by Airline
+			String name = getValidString(VALID_NAME, "Enter Airline Name (Letters only): ", scanner);
+			filterByAirline(name, flightList, scanner);
+		}
+		answer = (getValidString(Y_N_QUESTION, "Would you like to filter by city? [Y|N]", scanner)
+				.equalsIgnoreCase("Y"));
+		if (answer) {
+			// In this case, user wants to filter by City
+			String name = getValidString(VALID_NAME, "Enter City Name (Letters only): ", scanner);
+			filterByCity(name, flightList, scanner);
+		}
+		answer = (getValidString(Y_N_QUESTION, "Would you like to filter by terminal? [Y|N]", scanner)
+				.equalsIgnoreCase("Y"));
+		if (answer) {
+			choice = getValidInt(1, numOfTerminals, "Enter terminal number: ", scanner);
+			filterByTerminal(choice, flightList, scanner);
+		}
+		System.out.println("Would you like to filter by Direction?");
+		System.out.println("0: No");
+		System.out.println("1: All incoming");
+		System.out.println("2: All outgoing");
+		choice = getValidInt(0, 2, "Enter your choice ", scanner);
+		switch (choice) {
+		case 1:
+			filterByInOut(flightList, IncomingFlight.class, scanner);
+			break;
+		case 2:
+			filterByInOut(flightList, OutgoingFlight.class, scanner);
+			break;
+		}
+		return flightList;
+	}
+
+	private <T extends Flight> void filterByInOut(ArrayList<Flight> flightList, Class<T> class1, Scanner scanner) {
+		flightList = (ArrayList<Flight>) flightList.stream().filter(flight -> flight.getClass().equals(class1))
+				.collect(Collectors.toList());
+	}
+
+	private void filterByTerminal(int choice, ArrayList<Flight> flightList, Scanner scanner) {
+		flightList = (ArrayList<Flight>) flightList.stream().filter(flight -> flight.getTerminal() == choice)
+				.collect(Collectors.toList());
+
+	}
+
+	private void filterByCity(String name, ArrayList<Flight> flightList, Scanner scanner) {
+		flightList = (ArrayList<Flight>) flightList.stream().filter(flight -> flight.getCity().equalsIgnoreCase(name))
+				.collect(Collectors.toList());
+	}
+
+	private void filterByAirline(String name, ArrayList<Flight> flightList, Scanner scanner) {
+		flightList = (ArrayList<Flight>) flightList.stream()
+				.filter(flight -> flight.getAirline().equalsIgnoreCase(name)).collect(Collectors.toList());
+	}
+
+	private void filterFlightsBefore(ArrayList<Flight> flightList, LocalDateTime dateTimeBuilder) {
+		flightList = (ArrayList<Flight>) flightList.stream()
+				.filter(flight -> ((flight.getFlightTime()).compareTo(dateTimeBuilder) <= 0))
+				.collect(Collectors.toList());
+
+	}
+
+	private void filterFlightsAfter(ArrayList<Flight> flightList, LocalDateTime dateTimeBuilder) {
+		flightList = (ArrayList<Flight>) flightList.stream()
+				.filter(flight -> ((flight.getFlightTime()).compareTo(dateTimeBuilder) >= 0))
+				.collect(Collectors.toList());
+
 	}
 
 	/**

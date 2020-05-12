@@ -30,7 +30,7 @@ public abstract class Flight implements Comparable<Flight> {
 	}
 
 	private boolean setFlightNumber(String flightNumber) {
-		Pattern p = Pattern.compile("(^([A-Z]{1,3})([0-9]{1,4})$)"); // 1-3 capital letters, 1-4 digits
+		Pattern p = Pattern.compile("(^([A-Z]{0,3})([0-9]{1,4})$)"); // 1-3 capital letters, 1-4 digits
 		Matcher m = p.matcher(flightNumber);
 		if (!m.find())
 			return false;
@@ -39,6 +39,7 @@ public abstract class Flight implements Comparable<Flight> {
 		this.flightNumber = flightNumber.replace(m.group(3), filler);
 		return true;
 	}
+	
 
 	public String getCity() {
 		return city;

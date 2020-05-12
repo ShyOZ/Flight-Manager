@@ -24,3 +24,4 @@ public class IncomingFlight extends Flight {
 		return super.toString().replace("departing to/coming from", "coming from");
 	}
 }
+

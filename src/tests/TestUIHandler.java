@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.TreeSet;
 
@@ -97,4 +98,45 @@ class TestUIHandler {
 		tree.add(londonOut);
 		assertEquals(handler.getAllFlights(), tree);
 	}
+
+	@Test
+	void testFlightFilter() {
+		handler = new UIHandler();
+		// This flight is supposed to remain at the end of the test.
+		Flight testFlight1 = new IncomingFlight("Elal", "LY1", "New York", LocalDateTime.of(2020, 05, 20, 00, 45), 3);
+		// These flights is supposed to be filtered by time.
+		Flight testFlightFilteredAfter = new IncomingFlight("Elal", "LY1", "New York",
+				LocalDateTime.of(2022, 11, 10, 00, 45), 3);
+		Flight testFlightFilteredBefore = new IncomingFlight("Elal", "LY1", "New York",
+				LocalDateTime.of(2020, 05, 10, 00, 45), 3);
+		// This flight is filtered by Airline.
+		Flight testFlightFilteredByAirline = new IncomingFlight("Turkish", "LY1", "New York",
+				LocalDateTime.of(2021, 06, 15, 00, 45), 3);
+		// This flight is filtered by City.
+		Flight testFlightFilteredByCity = new IncomingFlight("Elal", "LY1", "London",
+				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
+		// This flight is filtered by Terminal.
+		Flight testFlightFilteredByTerminal = new IncomingFlight("Elal", "LY1", "New York",
+				LocalDateTime.of(2020, 05, 20, 00, 45), 1);
+		// This flight is filtered by Direction.
+		Flight testFlightFilteredByDirection = new OutgoingFlight("Elal", "LY1", "New York",
+				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
+		handler.addFlight(testFlight1);
+		handler.addFlight(testFlightFilteredAfter);
+		handler.addFlight(testFlightFilteredBefore);
+		handler.addFlight(testFlightFilteredByAirline);
+		handler.addFlight(testFlightFilteredByCity);
+		handler.addFlight(testFlightFilteredByTerminal);
+		handler.addFlight(testFlightFilteredByDirection);
+		String input = "3\n2020\n5\n16\n0\n0\n2022\n10\n10\n0\n0\nY\nElal\nY\nNew York\nY\n3\n1";
+		Scanner scanner = new Scanner(input);
+
+		ArrayList<Flight> testList = handler.filteringFlightMenu(scanner);
+		for (Flight flight : testList) {
+			System.out.println(flight);
+		}
+		ArrayList<Flight> expectedList = new ArrayList<>();
+		assertTrue(expectedList.equals(testList));
+	}
+
 }
