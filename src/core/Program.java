@@ -7,34 +7,30 @@ public class Program {
 	public static void main(String[] args) {
 
 		Scanner scanner = new Scanner(System.in);
-		UIHandler helper = new UIHandler();
+		UIHandler handler = new UIHandler();
 		int choice;
 		do {
-			choice = helper.showMenu(scanner);
+			choice = handler.showMenu(scanner);
 			switch (choice) {
 			case 0:
 				System.out.println("Bye Bye!");
 				break;
 			case 1:
-				helper.addNewFlight(scanner);
+				handler.addNewFlight(scanner);
 				break;
 			case 2:
-				helper.showAllFlights();
+				handler.showAllFlights();
 				break;
 			case 3:
-				helper.showIncomingFlights();
+				handler.showFlightsByFilter(scanner);
 				break;
 			case 4:
-				helper.showOutgoingFlights();
+				handler.saveFlightsToFile();
 				break;
 			case 5:
-				helper.saveFlightsToFile();
-				break;
-			case 6:
-				helper.loadFromFile("flights");
+				handler.loadFromFile(scanner);
 				break;
 			}
 		} while (choice != 0);
 	}
 }
-

@@ -1,8 +1,6 @@
 package tests;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -131,7 +129,7 @@ class TestUIHandler {
 		String input = "3\n2020\n5\n16\n0\n0\n2022\n10\n10\n0\n0\nY\nElal\nY\nNew York\nY\n3\n1";
 		Scanner scanner = new Scanner(input);
 
-		ArrayList<Flight> testList = handler.filteringFlightMenu(scanner);
+		ArrayList<Flight> testList = handler.showFlightsByFilter(scanner);
 		for (Flight flight : testList) {
 			System.out.println(flight);
 		}

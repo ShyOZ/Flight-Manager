@@ -1,7 +1,10 @@
 package tests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeFalse;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.time.LocalDateTime;
 
@@ -44,8 +47,8 @@ class TestFlightClasses {
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
 		Flight testOutgoingFlight = new OutgoingFlight("Test Airline", "TST101", "London",
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
-		assertEquals(true, testIncomingFlight.equals(testIncomingFlight));
-		assertEquals(true, testOutgoingFlight.equals(testOutgoingFlight));
+		assumeTrue(testIncomingFlight.equals(testIncomingFlight));
+		assertTrue(testOutgoingFlight.equals(testOutgoingFlight));
 	}
 
 	@Test
@@ -60,8 +63,8 @@ class TestFlightClasses {
 
 		Flight testContentEqualsAndSameOutgoingType = new OutgoingFlight("Test Airline", "TST101", "London",
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
-		assertEquals(true, testIncomingFlight.equals(testContentEqualsAndSameIncomingType));
-		assertEquals(true, testOutgoingFlight.equals(testContentEqualsAndSameOutgoingType));
+		assumeTrue(testIncomingFlight.equals(testContentEqualsAndSameIncomingType));
+		assertTrue(testOutgoingFlight.equals(testContentEqualsAndSameOutgoingType));
 	}
 
 	@Test
@@ -71,8 +74,8 @@ class TestFlightClasses {
 
 		Flight testOutgoingFlight = new OutgoingFlight("Test Airline", "TST101", "London",
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
-		assertEquals(false, testIncomingFlight.equals(new Object()));
-		assertEquals(false, testOutgoingFlight.equals(new Object()));
+		assumeFalse(testIncomingFlight.equals(new Object()));
+		assertFalse(testOutgoingFlight.equals(new Object()));
 	}
 
 	@Test
@@ -82,8 +85,8 @@ class TestFlightClasses {
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
 		Flight testOutgoingFlight = new OutgoingFlight("Test Airline", "TST101", "London",
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
-		assertEquals(false, testFlight.equals(testOutgoingFlight));
-		assertEquals(false, testOutgoingFlight.equals(testFlight));
+		assumeFalse(testFlight.equals(testOutgoingFlight));
+		assertFalse(testOutgoingFlight.equals(testFlight));
 
 	}
 
@@ -93,8 +96,8 @@ class TestFlightClasses {
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
 		Flight testCompareFlightTime = new IncomingFlight("Test Airline", "TST101", "London",
 				LocalDateTime.of(2022, 2, 2, 2, 3), 3);
-		assertEquals(false, testFlight.equals(testCompareFlightTime));
-		assertEquals(-1, testFlight.compareTo(testCompareFlightTime));
+		assumeFalse(testFlight.equals(testCompareFlightTime));
+		assertTrue(testFlight.compareTo(testCompareFlightTime) < 0);
 
 	}
 
@@ -104,8 +107,8 @@ class TestFlightClasses {
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
 		Flight testcompareAirline = new IncomingFlight("Test Airline2", "TST101", "London",
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
-		assertEquals(false, testFlight.equals(testcompareAirline));
-		assertEquals(-1, testFlight.compareTo(testcompareAirline));
+		assumeFalse(testFlight.equals(testcompareAirline));
+		assertTrue(testFlight.compareTo(testcompareAirline) < 0);
 	}
 
 	@Test
@@ -114,8 +117,8 @@ class TestFlightClasses {
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
 		Flight testCompareFlightNumber = new IncomingFlight("Test Airline", "TST102", "London",
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
-		assertEquals(false, testFlight.equals(testCompareFlightNumber));
-		assertEquals(-1, testFlight.compareTo(testCompareFlightNumber));
+		assumeFalse(testFlight.equals(testCompareFlightNumber));
+		assertTrue(testFlight.compareTo(testCompareFlightNumber) < 0);
 	}
 
 	@Test
@@ -124,8 +127,8 @@ class TestFlightClasses {
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
 		Flight testCompareCity = new IncomingFlight("Test Airline", "TST101", "London2",
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
-		assertEquals(false, testFlight.equals(testCompareCity));
-		assertEquals(-1, testFlight.compareTo(testCompareCity));
+		assumeFalse(testFlight.equals(testCompareCity));
+		assertTrue(testFlight.compareTo(testCompareCity) < 0);
 	}
 
 	@Test
@@ -135,7 +138,7 @@ class TestFlightClasses {
 		Flight testCompareTerminal = new IncomingFlight("Test Airline", "TST101", "London",
 				LocalDateTime.of(2022, 2, 2, 2, 2), 4);
 		assumeFalse(testFlight.equals(testCompareTerminal));
-		assertEquals(-1, testFlight.compareTo(testCompareTerminal));
+		assertTrue(testFlight.compareTo(testCompareTerminal) < 0);
 	}
 
 	@Test
@@ -144,7 +147,7 @@ class TestFlightClasses {
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
 		Flight testCompareTerminal = new IncomingFlight("Test Airline", "TST101", "London",
 				LocalDateTime.of(2022, 2, 2, 2, 2), 4);
-		assertEquals(false, testFlight.equals(testCompareTerminal));
-		assertEquals(-1, testFlight.compareTo(testCompareTerminal));
+		assumeFalse(testFlight.equals(testCompareTerminal));
+		assertTrue(testFlight.compareTo(testCompareTerminal) < 0);
 	}
 }

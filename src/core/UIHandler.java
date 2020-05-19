@@ -20,10 +20,10 @@ public class UIHandler {
 	private TreeSet<Flight> incomingFlights = new TreeSet<>();
 	private TreeSet<Flight> outgoingFlights = new TreeSet<>();
 	private int numOfTerminals;
-	private final int BASE_NUM_OF_TERMINALS = 3;
+	private final static int BASE_NUM_OF_TERMINALS = 3;
 	private final String VALID_NAME = "[a-zA-Z ]+";
 	private final String VALID_FLIGHTNUMBER = "(^([A-Z]{0,3})([0-9]{1,4})$)";
-	private final String Y_N_QUESTION = "Y|N";
+	private final String YES_NO_QUESTION = "Y|N";
 	private final String IN_OR_OUT = "IN|OUT";
 
 	// Properties (Getters and Setters)
@@ -52,7 +52,7 @@ public class UIHandler {
 
 	// Constructors
 	public UIHandler() {
-		this(3);
+		this(BASE_NUM_OF_TERMINALS);
 	}
 
 	public UIHandler(int numOfTerminals) {
@@ -64,12 +64,9 @@ public class UIHandler {
 		System.out.println("========== MENU ==========");
 		System.out.println("1: Add a new Flight");
 		System.out.println("2: Show all Flights");
-//		System.out.println("3: Show all incoming flights");
-		System.out.println("3: Show wanted flight");
-//		System.out.println("4: Show all outgoing flights");
+		System.out.println("3: Filter and show flights");
 		System.out.println("4: Save to file");
 		System.out.println("5: Load from file");
-//		System.out.println("7: Remove a flight");
 		System.out.println("0: EXIT");
 		System.out.println("========== MENU ==========");
 		return getValidInt(0, 5, "Enter your choice", scanner);
@@ -136,7 +133,7 @@ public class UIHandler {
 		}
 	}
 
-	public ArrayList<Flight> filteringFlightMenu(Scanner scanner) {
+	public ArrayList<Flight> showFlightsByFilter(Scanner scanner) {
 		// Function that receives a list of all flights here
 		List<Flight> flightList = new ArrayList<>(allFlights);
 		System.out.println("Would you like to filter by Time?");
@@ -166,21 +163,21 @@ public class UIHandler {
 			flightList = filterFlightsAfter(flightList, laterThan);
 			break;
 		}
-		boolean answer = (getValidString(Y_N_QUESTION, "Would you like to filter by airline? [Y|N]", scanner)
+		boolean answer = (getValidString(YES_NO_QUESTION, "Would you like to filter by airline? [Y|N]", scanner)
 				.equalsIgnoreCase("Y"));
 		if (answer) {
 			// In this case, user wants to filter by Airline
 			String name = getValidString(VALID_NAME, "Enter Airline Name (Letters only): ", scanner);
 			flightList = filterByAirline(name, flightList, scanner);
 		}
-		answer = (getValidString(Y_N_QUESTION, "Would you like to filter by city? [Y|N]", scanner)
+		answer = (getValidString(YES_NO_QUESTION, "Would you like to filter by city? [Y|N]", scanner)
 				.equalsIgnoreCase("Y"));
 		if (answer) {
 			// In this case, user wants to filter by City
 			String name = getValidString(VALID_NAME, "Enter City Name (Letters only): ", scanner);
 			flightList = filterByCity(name, flightList, scanner);
 		}
-		answer = (getValidString(Y_N_QUESTION, "Would you like to filter by terminal? [Y|N]", scanner)
+		answer = (getValidString(YES_NO_QUESTION, "Would you like to filter by terminal? [Y|N]", scanner)
 				.equalsIgnoreCase("Y"));
 		if (answer) {
 			choice = getValidInt(1, numOfTerminals, "Enter terminal number: ", scanner);
@@ -289,7 +286,7 @@ public class UIHandler {
 	}
 
 	public void saveFlightsToFile() {
-		saveToFile("flights");
+		saveToFile("resources/flights.csv");
 	}
 
 	// no need to test
@@ -338,7 +335,8 @@ public class UIHandler {
 		return (isIncoming) ? new IncomingFlight(airline, flightNumber, city, flightTime, terminal)
 				: new OutgoingFlight(airline, flightNumber, city, flightTime, terminal);
 	}
-
+	
+	
 	public boolean saveToFile(String pathname) {
 		File f;
 		f = (pathname.endsWith(".csv")) ? new File(pathname) : new File(pathname + ".csv");
@@ -362,6 +360,11 @@ public class UIHandler {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	public void loadFromFile(Scanner scanner) {
+		String pathname = getValidString(".+", "Enter file pathname", scanner);
+		loadFromFile(pathname);
 	}
 
 	/**
@@ -390,6 +393,11 @@ public class UIHandler {
 		addFromFile(file);
 	}
 
+	public void addFromFile(Scanner scanner) {
+		String pathname = getValidString(".+", "Enter file pathname", scanner);
+		addFromFile(pathname);
+	}
+
 	/**
 	 * <p>
 	 * Adds new flights to existing flights from a file with the given
@@ -413,9 +421,9 @@ public class UIHandler {
 	 */
 	public void addFromFile(File file) {
 		TreeSet<Flight> flightsToAdd = readFromFile(file);
-		for (Flight flight : flightsToAdd) {
-			addFlight(flight);
-		}
+		if (flightsToAdd != null)
+			for (Flight flight : flightsToAdd)
+				addFlight(flight);
 	}
 
 	private TreeSet<Flight> readFromFile(File file) {
@@ -429,7 +437,7 @@ public class UIHandler {
 			scanner.close();
 			return flights;
 		} catch (FileNotFoundException e) {
-			System.err.println();
+			System.err.println("File not found!");
 			return null;
 		}
 	}
