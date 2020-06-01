@@ -76,7 +76,7 @@ class TestUIHandler {
 		Flight londonOut = new OutgoingFlight("Elal", "LY315", "London", LocalDateTime.of(2020, 05, 20, 10, 10), 3);
 		handler.addFlight(newYorkIn);
 		handler.addFlight(londonOut);
-		handler.saveToFile(TEST_FILE_PATH);
+		handler.saveAllToFile(TEST_FILE_PATH);
 
 		StringBuilder expectedCSVContent = new StringBuilder();
 		expectedCSVContent.append("Airline,Flight Number,Year,Month,Day,Hour,Minute,City,Terminal,Direction\n");
@@ -102,7 +102,7 @@ class TestUIHandler {
 		handler = new UIHandler();
 		// This flight is supposed to remain at the end of the test.
 		Flight testFlight1 = new IncomingFlight("Elal", "LY1", "New York", LocalDateTime.of(2020, 05, 20, 00, 45), 3);
-		// These flights is supposed to be filtered by time.
+		// These flights are supposed to be filtered by time.
 		Flight testFlight2FilteredAfter = new IncomingFlight("Elal", "LY1", "New York",
 				LocalDateTime.of(2022, 11, 10, 00, 45), 3);
 		Flight testFlight3FilteredBefore = new IncomingFlight("Elal", "LY1", "New York",
@@ -138,4 +138,43 @@ class TestUIHandler {
 		assertEquals(expectedList, testList);
 	}
 
+	@Test
+	void testFlightArgumentFilter() {
+		handler = new UIHandler();
+		// This flight is supposed to remain at the end of the test.
+		Flight testFlight1 = new IncomingFlight("Elal", "LY1", "New York", LocalDateTime.of(2020, 05, 20, 00, 45), 3);
+		// These flights are supposed to be filtered by time.
+		Flight testFlight2FilteredAfter = new IncomingFlight("Elal", "LY1", "New York",
+				LocalDateTime.of(2022, 11, 10, 00, 45), 3);
+		Flight testFlight3FilteredBefore = new IncomingFlight("Elal", "LY1", "New York",
+				LocalDateTime.of(2020, 05, 10, 00, 45), 3);
+		// This flight is filtered by Airline.
+		Flight testFlight4FilteredByAirline = new IncomingFlight("Turkish", "LY1", "New York",
+				LocalDateTime.of(2021, 06, 15, 00, 45), 3);
+		// This flight is filtered by City.
+		Flight testFlight5FilteredByCity = new IncomingFlight("Elal", "LY1", "London",
+				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
+		// This flight is filtered by Terminal.
+		Flight testFlight6FilteredByTerminal = new IncomingFlight("Elal", "LY1", "New York",
+				LocalDateTime.of(2020, 05, 20, 00, 45), 1);
+		// This flight is filtered by Direction.
+		Flight testFlight7FilteredByDirection = new OutgoingFlight("Elal", "LY1", "New York",
+				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
+		handler.addFlight(testFlight1);
+		handler.addFlight(testFlight2FilteredAfter);
+		handler.addFlight(testFlight3FilteredBefore);
+		handler.addFlight(testFlight4FilteredByAirline);
+		handler.addFlight(testFlight5FilteredByCity);
+		handler.addFlight(testFlight6FilteredByTerminal);
+		handler.addFlight(testFlight7FilteredByDirection);
+		String[] args = { "after-2020/05/16 00:00", "before-2022/10/10 00:00", "airline-Elal", "city-New York",
+				"terminal-3", "direction-incoming" };
+		ArrayList<Flight> testList = handler.filterByArguments(args);
+		for (Flight flight : testList) {
+			System.out.println(flight);
+		}
+		ArrayList<Flight> expectedList = new ArrayList<>();
+		expectedList.add(testFlight1);
+		assertEquals(expectedList, testList);
+	}
 }

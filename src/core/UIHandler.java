@@ -7,10 +7,12 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -19,6 +21,7 @@ public class UIHandler {
 	private TreeSet<Flight> allFlights = new TreeSet<>();
 	private TreeSet<Flight> incomingFlights = new TreeSet<>();
 	private TreeSet<Flight> outgoingFlights = new TreeSet<>();
+	private TreeSet<Flight> filteredFlights = new TreeSet<>();
 	private int numOfTerminals;
 	private final static int BASE_NUM_OF_TERMINALS = 3;
 	private final String VALID_NAME = "[a-zA-Z ]+";
@@ -61,14 +64,14 @@ public class UIHandler {
 
 	// Methods
 	public int showMenu(Scanner scanner) {
-		System.out.println("========== MENU ==========");
-		System.out.println("1: Add a new Flight");
-		System.out.println("2: Show all Flights");
-		System.out.println("3: Filter and show flights");
-		System.out.println("4: Save to file");
-		System.out.println("5: Load from file");
-		System.out.println("0: EXIT");
-		System.out.println("========== MENU ==========");
+		println("========== MENU ==========");
+		println("1: Add a new Flight");
+		println("2: Show all Flights");
+		println("3: Filter and show flights");
+		println("4: Save to file");
+		println("5: Load from file");
+		println("0: EXIT");
+		println("========== MENU ==========");
 		return getValidInt(0, 5, "Enter your choice", scanner);
 	}
 
@@ -96,7 +99,7 @@ public class UIHandler {
 		flightNumber = getValidString(VALID_FLIGHTNUMBER, "Enter flight number (capital letters and numbers only)",
 				scanner);
 
-		System.out.println("Enter the time of departure");
+		println("Enter the time of departure");
 		flightTime = dateTimeBuilder(scanner);
 
 		incoming = (getValidString(IN_OR_OUT, "Is the flight [IN] incoming or [OUT] outgoing?", scanner)
@@ -112,7 +115,7 @@ public class UIHandler {
 
 	private String getValidString(String regex, String message, Scanner scanner) {
 		while (true) {
-			System.out.println(message);
+			println(message);
 			String string = scanner.nextLine();
 			if (string.isBlank())
 				string = scanner.nextLine();
@@ -136,27 +139,27 @@ public class UIHandler {
 	public ArrayList<Flight> showFlightsByFilter(Scanner scanner) {
 		// Function that receives a list of all flights here
 		List<Flight> flightList = new ArrayList<>(allFlights);
-		System.out.println("Would you like to filter by Time?");
-		System.out.println("0: No");
-		System.out.println("1: All flights before a certain date");
-		System.out.println("2: All flights after a certain date");
-		System.out.println("3: All flights in a certain range");
+		println("Would you like to filter by Time?");
+		println("0: No");
+		println("1: All flights before a certain date");
+		println("2: All flights after a certain date");
+		println("3: All flights in a certain range");
 		int choice = getValidInt(0, 3, "Enter your choice", scanner);
 		switch (choice) {
 		case 1:
-			System.out.println("Before what time?");
+			println("Before what time?");
 			flightList = filterFlightsBefore(flightList, dateTimeBuilder(scanner));
 			break;
 		case 2:
-			System.out.println("After what time?");
+			println("After what time?");
 			flightList = filterFlightsAfter(flightList, dateTimeBuilder(scanner));
 			break;
 		case 3:
-			System.out.println("After what time?");
+			println("After what time?");
 			LocalDateTime laterThan = dateTimeBuilder(scanner);
 			LocalDateTime earlierThan;
 			do {
-				System.out.println("Before what time?");
+				println("Before what time?");
 				earlierThan = dateTimeBuilder(scanner);
 			} while (laterThan.isAfter(earlierThan));
 			flightList = filterFlightsBefore(flightList, earlierThan);
@@ -168,52 +171,54 @@ public class UIHandler {
 		if (answer) {
 			// In this case, user wants to filter by Airline
 			String name = getValidString(VALID_NAME, "Enter Airline Name (Letters only): ", scanner);
-			flightList = filterByAirline(name, flightList, scanner);
+			flightList = filterByAirline(name, flightList);
 		}
 		answer = (getValidString(YES_NO_QUESTION, "Would you like to filter by city? [Y|N]", scanner)
 				.equalsIgnoreCase("Y"));
 		if (answer) {
 			// In this case, user wants to filter by City
 			String name = getValidString(VALID_NAME, "Enter City Name (Letters only): ", scanner);
-			flightList = filterByCity(name, flightList, scanner);
+			flightList = filterByCity(name, flightList);
 		}
 		answer = (getValidString(YES_NO_QUESTION, "Would you like to filter by terminal? [Y|N]", scanner)
 				.equalsIgnoreCase("Y"));
 		if (answer) {
 			choice = getValidInt(1, numOfTerminals, "Enter terminal number: ", scanner);
-			flightList = filterByTerminal(choice, flightList, scanner);
+			flightList = filterByTerminal(choice, flightList);
 		}
-		System.out.println("Would you like to filter by Direction?");
-		System.out.println("0: No");
-		System.out.println("1: All incoming");
-		System.out.println("2: All outgoing");
+		println("Would you like to filter by Direction?");
+		println("0: No");
+		println("1: All incoming");
+		println("2: All outgoing");
 		choice = getValidInt(0, 2, "Enter your choice ", scanner);
 		switch (choice) {
 		case 1:
-			flightList = filterByInOut(flightList, IncomingFlight.class, scanner);
+			flightList = filterByInOut(flightList, IncomingFlight.class);
 			break;
 		case 2:
-			flightList = filterByInOut(flightList, OutgoingFlight.class, scanner);
+			flightList = filterByInOut(flightList, OutgoingFlight.class);
 			break;
 		}
+
+		filteredFlights = new TreeSet<Flight>(flightList);
 		return (ArrayList<Flight>) flightList;
 	}
 
-	private List<Flight> filterByInOut(List<Flight> flightList, Class<? extends Flight> flightType, Scanner scanner) {
+	private List<Flight> filterByInOut(List<Flight> flightList, Class<? extends Flight> flightType) {
 		return flightList.stream().filter(flight -> flight.getClass().equals(flightType)).collect(Collectors.toList());
 	}
 
-	private List<Flight> filterByTerminal(int choice, List<Flight> flightList, Scanner scanner) {
+	private List<Flight> filterByTerminal(int choice, List<Flight> flightList) {
 		return flightList.stream().filter(flight -> flight.getTerminal() == choice).collect(Collectors.toList());
 
 	}
 
-	private List<Flight> filterByCity(String name, List<Flight> flightList, Scanner scanner) {
+	private List<Flight> filterByCity(String name, List<Flight> flightList) {
 		return flightList.stream().filter(flight -> flight.getCity().equalsIgnoreCase(name))
 				.collect(Collectors.toList());
 	}
 
-	private List<Flight> filterByAirline(String name, List<Flight> flightList, Scanner scanner) {
+	private List<Flight> filterByAirline(String name, List<Flight> flightList) {
 		return flightList.stream().filter(flight -> flight.getAirline().equalsIgnoreCase(name))
 				.collect(Collectors.toList());
 	}
@@ -228,6 +233,83 @@ public class UIHandler {
 		return flightList.stream().filter(flight -> flight.getFlightTime().compareTo(dateTimeBuilder) >= 0)
 				.collect(Collectors.toList());
 
+	}
+
+	public ArrayList<Flight> filterByArguments(String[] args) {
+		return (ArrayList<Flight>) filterByArguments(new ArrayList<Flight>(allFlights), args);
+	}
+
+	private List<Flight> filterByArguments(List<Flight> flightList, String[] args) {
+		List<Flight> filteredFlights = flightList;
+		String value;
+		TreeMap<String, String> map = new TreeMap<>();
+
+		for (String s : args) {
+			String[] keyValue = s.split("-");
+			if (keyValue.length == 2)
+				map.put(keyValue[0], keyValue[1]);
+		}
+		value = map.get("after");
+		if (value != null) {
+			try {
+				LocalDateTime date = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"));
+				filteredFlights = filterFlightsAfter(filteredFlights, date);
+			} catch (Exception e) {
+				printErr("The date string " + value + " is not of the format \"yyyy/MM/dd HH:mm\".");
+			}
+		}
+
+		value = map.get("before");
+		if (value != null) {
+			try {
+				LocalDateTime date = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"));
+				filteredFlights = filterFlightsBefore(filteredFlights, date);
+			} catch (Exception e) {
+				printErr("The date string " + value + " is not of the format \"yyyy/MM/dd HH:mm\".");
+			}
+		}
+
+		value = map.get("airline");
+		if (value != null) {
+			if (value.matches(VALID_NAME))
+				filteredFlights = filterByAirline(value, filteredFlights);
+			else
+				printErr("Invalid airline name.");
+		}
+
+		value = map.get("city");
+		if (value != null) {
+			if (value.matches(VALID_NAME))
+				filteredFlights = filterByCity(value, filteredFlights);
+			else
+				printErr("Invalid city name.");
+		}
+
+		value = map.get("terminal");
+		if (value != null) {
+			try {
+				int terminalNumber = Integer.parseInt(value);
+				if (terminalNumber < 0 || numOfTerminals < terminalNumber)
+					printErr("Invalid terminal input (integer not in range).");
+				else
+					filteredFlights = filterByTerminal(terminalNumber, filteredFlights);
+
+			} catch (Exception e) {
+				printErr("Invalid terminal input (not an integer).");
+			}
+		}
+
+		value = map.get("direction");
+		if (value != null) {
+			if (value.equalsIgnoreCase("incoming"))
+				filteredFlights = filterByInOut(filteredFlights, IncomingFlight.class);
+			else if (value.equalsIgnoreCase("outgoing"))
+				filteredFlights = filterByInOut(filteredFlights, OutgoingFlight.class);
+			else
+				printErr("Invalid direction.");
+		}
+		this.filteredFlights = new TreeSet<Flight>(filteredFlights);
+		return filteredFlights;
 	}
 
 	/**
@@ -272,10 +354,10 @@ public class UIHandler {
 
 		while (true) {
 			try {
-				System.out.println(message + " " + range);
+				println(message + " " + range);
 				n = scanner.nextInt();
 				while (n < min || max < n) {
-					System.out.println(message + " " + range);
+					println(message + " " + range);
 					n = scanner.nextInt();
 				}
 				return n;
@@ -283,10 +365,6 @@ public class UIHandler {
 				scanner.nextLine();
 			}
 		}
-	}
-
-	public void saveFlightsToFile() {
-		saveToFile("resources/flights.csv");
 	}
 
 	// no need to test
@@ -305,11 +383,16 @@ public class UIHandler {
 	}
 
 	// no need to test
+	public void showFilteredFlights() {
+		showFlightList(filteredFlights);
+	}
+
+	// no need to test
 	private void showFlightList(Set<Flight> wantedList) {
 		if (wantedList.isEmpty())
-			System.out.println("Empty flight list!");
+			println("Empty flight list!");
 		for (Flight flight : wantedList)
-			System.out.println(flight);
+			println(flight);
 	}
 
 	private String flightToCommaSeparatedValue(Flight flight) {
@@ -335,22 +418,43 @@ public class UIHandler {
 		return (isIncoming) ? new IncomingFlight(airline, flightNumber, city, flightTime, terminal)
 				: new OutgoingFlight(airline, flightNumber, city, flightTime, terminal);
 	}
-	
-	
-	public boolean saveToFile(String pathname) {
-		File f;
-		f = (pathname.endsWith(".csv")) ? new File(pathname) : new File(pathname + ".csv");
-		return saveToFile(f);
+
+	public void saveAllToDefaultFile() {
+		saveAllToFile("resources/flights.csv");
 	}
 
-	public boolean saveToFile(File file) {
+	public void saveFilteredToDefaultFile() {
+		saveFilteredToFile("resources/flights.csv");
+	}
+
+	public boolean saveAllToFile(String pathname) {
+		File f;
+		f = (pathname.endsWith(".csv")) ? new File(pathname) : new File(pathname + ".csv");
+		return saveAllToFile(f);
+	}
+
+	public boolean saveFilteredToFile(String pathname) {
+		File f;
+		f = (pathname.endsWith(".csv")) ? new File(pathname) : new File(pathname + ".csv");
+		return saveFilteredToFile(f);
+	}
+
+	public boolean saveAllToFile(File file) {
+		return saveToFile(allFlights, file);
+	}
+
+	public boolean saveFilteredToFile(File file) {
+		return saveToFile(filteredFlights, file);
+	}
+
+	private boolean saveToFile(TreeSet<Flight> flights, File file) {
 		PrintWriter pw;
 		try {
 			pw = new PrintWriter(file);
 
 			StringBuilder sb = new StringBuilder(
 					"Airline,Flight Number,Year,Month,Day,Hour,Minute,City,Terminal,Direction\n");
-			for (Flight flight : allFlights) {
+			for (Flight flight : flights) {
 				sb.append(flightToCommaSeparatedValue(flight) + "\n");
 			}
 			pw.print(sb.toString());
@@ -360,6 +464,10 @@ public class UIHandler {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	public void loadFromDefaultFile() {
+		loadFromFile("resources/flights.csv");
 	}
 
 	public void loadFromFile(Scanner scanner) {
@@ -437,8 +545,16 @@ public class UIHandler {
 			scanner.close();
 			return flights;
 		} catch (FileNotFoundException e) {
-			System.err.println("File not found!");
+			printErr("File not found!");
 			return null;
 		}
+	}
+
+	private <T> void println(T s) {
+		System.out.println(FlightManager.cmdVersion ? s + "<br>" : s);
+	}
+
+	private <T> void printErr(T s) {
+		System.err.println(FlightManager.cmdVersion ? s + "<br>" : s);
 	}
 }
