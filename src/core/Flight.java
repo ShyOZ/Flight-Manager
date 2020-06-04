@@ -13,6 +13,8 @@ public abstract class Flight implements Comparable<Flight> {
 	protected String airline;
 	protected String flightNumber = "NUL0000";
 	protected String city;
+	protected String country;
+	protected String airport;
 	protected LocalDateTime flightTime;
 	protected int terminal;
 
@@ -39,14 +41,29 @@ public abstract class Flight implements Comparable<Flight> {
 		this.flightNumber = flightNumber.replace(m.group(3), filler);
 		return true;
 	}
-	
 
 	public String getCity() {
 		return city;
 	}
 
+	public String getCountry() {
+		return country;
+	}
+
+	public String getAirport() {
+		return this.airport;
+	}
+
 	private void setCity(String city) {
 		this.city = city;
+	}
+
+	private void setCountry(String country) {
+		this.country = country;
+	}
+
+	private void setAirport(String airport) {
+		this.airport = airport;
 	}
 
 	public LocalDateTime getFlightTime() {
@@ -67,10 +84,13 @@ public abstract class Flight implements Comparable<Flight> {
 	}
 
 	// Constructors
-	public Flight(String airline, String flightNumber, String city, LocalDateTime flightTime, int terminal) {
+	public Flight(String airline, String flightNumber, String city, String country, String airport,
+			LocalDateTime flightTime, int terminal) {
 		setAirline(airline);
 		setFlightNumber(flightNumber);
 		setCity(city);
+		setCountry(country);
+		setAirport(airport);
 		setFlightTime(flightTime);
 		setTerminal(terminal);
 	}
@@ -107,14 +127,16 @@ public abstract class Flight implements Comparable<Flight> {
 			return false;
 		Flight other = (Flight) obj;
 		return Objects.equals(airline, other.airline) && Objects.equals(city, other.city)
+				&& Objects.equals(country, other.country) && Objects.equals(airport, other.airport)
 				&& Objects.equals(flightNumber, other.flightNumber) && Objects.equals(flightTime, other.flightTime)
 				&& terminal == other.terminal;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("%s flight number %s, departing to/coming from %s; scheduled time: %s, at terminal %d",
-				airline, flightNumber, city, flightTime.format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")),
-				terminal);
+		return String.format(
+				"%s flight number %s, departing to/coming from %s , %s, $s; scheduled time: %s, at terminal %d",
+				airline, flightNumber, airport, city, country,
+				flightTime.format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")), terminal);
 	}
 }

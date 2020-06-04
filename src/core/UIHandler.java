@@ -92,6 +92,8 @@ public class UIHandler {
 		LocalDateTime flightTime;
 		boolean incoming;
 		String city;
+		String country;
+		String airport;
 		int terminal;
 
 		airline = getValidString(VALID_NAME, "Enter airline's name (letters and spaces only)", scanner);
@@ -104,13 +106,19 @@ public class UIHandler {
 
 		incoming = (getValidString(IN_OR_OUT, "Is the flight [IN] incoming or [OUT] outgoing?", scanner)
 				.equalsIgnoreCase("IN"));
-		city = incoming ? "origin" : "destination";
+		String inOrOut = incoming ? "origin" : "destination";
 
-		city = getValidString(VALID_NAME, String.format("Enter %s city (letters and spaces only)", city), scanner);
+		city = getValidString(VALID_NAME, String.format("Enter %s city (letters and spaces only)", inOrOut), scanner);
+
+		country = getValidString(VALID_NAME, String.format("Enter %s country (letters and spaces only)", inOrOut),
+				scanner);
+		airport = getValidString(VALID_NAME, String.format("Enter %s airport (letters and spaces only)", inOrOut),
+				scanner);
+
 		terminal = getValidInt(1, numOfTerminals, "Enter terminal number", scanner);
 		scanner.nextLine();
-		return (incoming) ? new IncomingFlight(airline, flightNumber, city, flightTime, terminal)
-				: new OutgoingFlight(airline, flightNumber, city, flightTime, terminal);
+		return (incoming) ? new IncomingFlight(airline, flightNumber, city, country, airport, flightTime, terminal)
+				: new OutgoingFlight(airline, flightNumber, city, country, airport, flightTime, terminal);
 	}
 
 	private String getValidString(String regex, String message, Scanner scanner) {
@@ -148,11 +156,11 @@ public class UIHandler {
 		switch (choice) {
 		case 1:
 			println("Before what time?");
-			flightList = filterFlightsBefore(flightList, dateTimeBuilder(scanner));
+			flightList = filterFlightsTo(flightList, dateTimeBuilder(scanner));
 			break;
 		case 2:
 			println("After what time?");
-			flightList = filterFlightsAfter(flightList, dateTimeBuilder(scanner));
+			flightList = filterFlightsFrom(flightList, dateTimeBuilder(scanner));
 			break;
 		case 3:
 			println("After what time?");
@@ -162,8 +170,8 @@ public class UIHandler {
 				println("Before what time?");
 				earlierThan = dateTimeBuilder(scanner);
 			} while (laterThan.isAfter(earlierThan));
-			flightList = filterFlightsBefore(flightList, earlierThan);
-			flightList = filterFlightsAfter(flightList, laterThan);
+			flightList = filterFlightsTo(flightList, earlierThan);
+			flightList = filterFlightsFrom(flightList, laterThan);
 			break;
 		}
 		boolean answer = (getValidString(YES_NO_QUESTION, "Would you like to filter by airline? [Y|N]", scanner)
@@ -223,13 +231,13 @@ public class UIHandler {
 				.collect(Collectors.toList());
 	}
 
-	private List<Flight> filterFlightsBefore(List<Flight> flightList, LocalDateTime dateTimeBuilder) {
+	private List<Flight> filterFlightsTo(List<Flight> flightList, LocalDateTime dateTimeBuilder) {
 		return flightList.stream().filter(flight -> flight.getFlightTime().compareTo(dateTimeBuilder) <= 0)
 				.collect(Collectors.toList());
 
 	}
 
-	private List<Flight> filterFlightsAfter(List<Flight> flightList, LocalDateTime dateTimeBuilder) {
+	private List<Flight> filterFlightsFrom(List<Flight> flightList, LocalDateTime dateTimeBuilder) {
 		return flightList.stream().filter(flight -> flight.getFlightTime().compareTo(dateTimeBuilder) >= 0)
 				.collect(Collectors.toList());
 
@@ -249,21 +257,21 @@ public class UIHandler {
 			if (keyValue.length == 2)
 				map.put(keyValue[0], keyValue[1]);
 		}
-		value = map.get("after");
+		value = map.get("from");
 		if (value != null) {
 			try {
 				LocalDateTime date = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"));
-				filteredFlights = filterFlightsAfter(filteredFlights, date);
+				filteredFlights = filterFlightsFrom(filteredFlights, date);
 			} catch (Exception e) {
 				printErr("The date string " + value + " is not of the format \"yyyy/MM/dd HH:mm\".");
 			}
 		}
 
-		value = map.get("before");
+		value = map.get("to");
 		if (value != null) {
 			try {
 				LocalDateTime date = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"));
-				filteredFlights = filterFlightsBefore(filteredFlights, date);
+				filteredFlights = filterFlightsTo(filteredFlights, date);
 			} catch (Exception e) {
 				printErr("The date string " + value + " is not of the format \"yyyy/MM/dd HH:mm\".");
 			}
@@ -301,9 +309,9 @@ public class UIHandler {
 
 		value = map.get("direction");
 		if (value != null) {
-			if (value.equalsIgnoreCase("incoming"))
+			if (value.equalsIgnoreCase("arrivals"))
 				filteredFlights = filterByInOut(filteredFlights, IncomingFlight.class);
-			else if (value.equalsIgnoreCase("outgoing"))
+			else if (value.equalsIgnoreCase("departures"))
 				filteredFlights = filterByInOut(filteredFlights, OutgoingFlight.class);
 			else
 				printErr("Invalid direction.");
@@ -397,7 +405,8 @@ public class UIHandler {
 
 	private String flightToCommaSeparatedValue(Flight flight) {
 		String direction = flight.getClass().getSimpleName().replace("Flight", "").toUpperCase();
-		return String.format("%s,%s,%s,%s,%s,%s", flight.getAirline(), flight.getFlightNumber(), flight.getCity(),
+		return String.format("%s,%s,%s,%s,%s,%s,%s,%s", flight.getAirline(), flight.getFlightNumber(), flight.getCity(),
+				flight.getCountry(), flight.getAirport(),
 				flight.getFlightTime().format(DateTimeFormatter.ofPattern("yyyy,MM,dd,HH,mm")), flight.getTerminal(),
 				direction);
 	}
@@ -407,16 +416,18 @@ public class UIHandler {
 		String airline = values[0];
 		String flightNumber = values[1];
 		String city = values[2];
-		int year = Integer.parseInt(values[3]);
-		int month = Integer.parseInt(values[4]);
-		int dayOfMonth = Integer.parseInt(values[5]);
-		int hour = Integer.parseInt(values[6]);
-		int minute = Integer.parseInt(values[7]);
+		String country = values[3];
+		String airport = values[4];
+		int year = Integer.parseInt(values[5]);
+		int month = Integer.parseInt(values[6]);
+		int dayOfMonth = Integer.parseInt(values[7]);
+		int hour = Integer.parseInt(values[8]);
+		int minute = Integer.parseInt(values[9]);
 		LocalDateTime flightTime = LocalDateTime.of(year, month, dayOfMonth, hour, minute);
-		int terminal = Integer.parseInt(values[8]);
-		boolean isIncoming = values[9].contentEquals("INCOMING");
-		return (isIncoming) ? new IncomingFlight(airline, flightNumber, city, flightTime, terminal)
-				: new OutgoingFlight(airline, flightNumber, city, flightTime, terminal);
+		int terminal = Integer.parseInt(values[10]);
+		boolean isIncoming = values[11].contentEquals("INCOMING");
+		return (isIncoming) ? new IncomingFlight(airline, flightNumber, city, country, airport, flightTime, terminal)
+				: new OutgoingFlight(airline, flightNumber, city, country, airport, flightTime, terminal);
 	}
 
 	public void saveAllToDefaultFile() {

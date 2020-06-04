@@ -61,9 +61,9 @@ class TestUIHandler {
 		Scanner testScanner = new Scanner(input.toString());
 
 		Flight expectedFlight = (flightType.contentEquals("IN"))
-				? new IncomingFlight("Test Airline", "TST0101", "Testing Grounds",
+				? new IncomingFlight("Test Airline", "TST0101", "Testing Grounds", "Test Country", "Test Airport",
 						LocalDateTime.of(2021, 12, 02, 20, 21), 3)
-				: new OutgoingFlight("Test Airline", "TST0101", "Testing Grounds",
+				: new OutgoingFlight("Test Airline", "TST0101", "Testing Grounds", "Test Country", "Test Airport",
 						LocalDateTime.of(2021, 12, 02, 20, 21), 3);
 		handler.addNewFlight(testScanner);
 		assertEquals(expectedFlight, handler.getAllFlights().first());
@@ -72,8 +72,10 @@ class TestUIHandler {
 	@Test
 	void testReadAndWriteToCSV() throws FileNotFoundException {
 		handler = new UIHandler();
-		Flight newYorkIn = new IncomingFlight("Elal", "LY1", "New York", LocalDateTime.of(2020, 05, 20, 00, 45), 3);
-		Flight londonOut = new OutgoingFlight("Elal", "LY315", "London", LocalDateTime.of(2020, 05, 20, 10, 10), 3);
+		Flight newYorkIn = new IncomingFlight("Elal", "LY1", "New York", "United States", "John F Kennedy",
+				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
+		Flight londonOut = new OutgoingFlight("Elal", "LY315", "London", "England", "Heathrow",
+				LocalDateTime.of(2020, 05, 20, 10, 10), 3);
 		handler.addFlight(newYorkIn);
 		handler.addFlight(londonOut);
 		handler.saveAllToFile(TEST_FILE_PATH);
@@ -101,24 +103,25 @@ class TestUIHandler {
 	void testFlightFilter() {
 		handler = new UIHandler();
 		// This flight is supposed to remain at the end of the test.
-		Flight testFlight1 = new IncomingFlight("Elal", "LY1", "New York", LocalDateTime.of(2020, 05, 20, 00, 45), 3);
+		Flight testFlight1 = new IncomingFlight("Elal", "LY1", "New York", "United States", "John F Kennedy",
+				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
 		// These flights are supposed to be filtered by time.
-		Flight testFlight2FilteredAfter = new IncomingFlight("Elal", "LY1", "New York",
-				LocalDateTime.of(2022, 11, 10, 00, 45), 3);
-		Flight testFlight3FilteredBefore = new IncomingFlight("Elal", "LY1", "New York",
-				LocalDateTime.of(2020, 05, 10, 00, 45), 3);
+		Flight testFlight2FilteredAfter = new IncomingFlight("Elal", "LY1", "New York", "United States",
+				"John F Kennedy", LocalDateTime.of(2022, 11, 10, 00, 45), 3);
+		Flight testFlight3FilteredBefore = new IncomingFlight("Elal", "LY1", "New York", "United States",
+				"John F Kennedy", LocalDateTime.of(2020, 05, 10, 00, 45), 3);
 		// This flight is filtered by Airline.
-		Flight testFlight4FilteredByAirline = new IncomingFlight("Turkish", "LY1", "New York",
-				LocalDateTime.of(2021, 06, 15, 00, 45), 3);
+		Flight testFlight4FilteredByAirline = new IncomingFlight("Turkish", "LY1", "New York", "United States",
+				"John F Kennedy", LocalDateTime.of(2021, 06, 15, 00, 45), 3);
 		// This flight is filtered by City.
-		Flight testFlight5FilteredByCity = new IncomingFlight("Elal", "LY1", "London",
+		Flight testFlight5FilteredByCity = new IncomingFlight("Elal", "LY1", "London", "England", "Heathrow",
 				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
 		// This flight is filtered by Terminal.
-		Flight testFlight6FilteredByTerminal = new IncomingFlight("Elal", "LY1", "New York",
-				LocalDateTime.of(2020, 05, 20, 00, 45), 1);
+		Flight testFlight6FilteredByTerminal = new IncomingFlight("Elal", "LY1", "New York", "United States",
+				"John F Kennedy", LocalDateTime.of(2020, 05, 20, 00, 45), 1);
 		// This flight is filtered by Direction.
-		Flight testFlight7FilteredByDirection = new OutgoingFlight("Elal", "LY1", "New York",
-				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
+		Flight testFlight7FilteredByDirection = new OutgoingFlight("Elal", "LY1", "New York", "United States",
+				"John F Kennedy", LocalDateTime.of(2020, 05, 20, 00, 45), 3);
 		handler.addFlight(testFlight1);
 		handler.addFlight(testFlight2FilteredAfter);
 		handler.addFlight(testFlight3FilteredBefore);
@@ -142,24 +145,25 @@ class TestUIHandler {
 	void testFlightArgumentFilter() {
 		handler = new UIHandler();
 		// This flight is supposed to remain at the end of the test.
-		Flight testFlight1 = new IncomingFlight("Elal", "LY1", "New York", LocalDateTime.of(2020, 05, 20, 00, 45), 3);
+		Flight testFlight1 = new IncomingFlight("Elal", "LY1", "New York", "United States", "John F Kennedy",
+				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
 		// These flights are supposed to be filtered by time.
-		Flight testFlight2FilteredAfter = new IncomingFlight("Elal", "LY1", "New York",
-				LocalDateTime.of(2022, 11, 10, 00, 45), 3);
-		Flight testFlight3FilteredBefore = new IncomingFlight("Elal", "LY1", "New York",
-				LocalDateTime.of(2020, 05, 10, 00, 45), 3);
+		Flight testFlight2FilteredAfter = new IncomingFlight("Elal", "LY1", "New York", "United States",
+				"John F Kennedy", LocalDateTime.of(2022, 11, 10, 00, 45), 3);
+		Flight testFlight3FilteredBefore = new IncomingFlight("Elal", "LY1", "New York", "United States",
+				"John F Kennedy", LocalDateTime.of(2020, 05, 10, 00, 45), 3);
 		// This flight is filtered by Airline.
-		Flight testFlight4FilteredByAirline = new IncomingFlight("Turkish", "LY1", "New York",
-				LocalDateTime.of(2021, 06, 15, 00, 45), 3);
+		Flight testFlight4FilteredByAirline = new IncomingFlight("Turkish", "LY1", "New York", "United States",
+				"John F Kennedy", LocalDateTime.of(2021, 06, 15, 00, 45), 3);
 		// This flight is filtered by City.
-		Flight testFlight5FilteredByCity = new IncomingFlight("Elal", "LY1", "London",
+		Flight testFlight5FilteredByCity = new IncomingFlight("Elal", "LY1", "London", "England", "Heathrow",
 				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
 		// This flight is filtered by Terminal.
-		Flight testFlight6FilteredByTerminal = new IncomingFlight("Elal", "LY1", "New York",
-				LocalDateTime.of(2020, 05, 20, 00, 45), 1);
+		Flight testFlight6FilteredByTerminal = new IncomingFlight("Elal", "LY1", "New York", "United States",
+				"John F Kennedy", LocalDateTime.of(2020, 05, 20, 00, 45), 1);
 		// This flight is filtered by Direction.
-		Flight testFlight7FilteredByDirection = new OutgoingFlight("Elal", "LY1", "New York",
-				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
+		Flight testFlight7FilteredByDirection = new OutgoingFlight("Elal", "LY1", "New York", "United States",
+				"John F Kennedy", LocalDateTime.of(2020, 05, 20, 00, 45), 3);
 		handler.addFlight(testFlight1);
 		handler.addFlight(testFlight2FilteredAfter);
 		handler.addFlight(testFlight3FilteredBefore);

@@ -3,9 +3,9 @@ package core;
 import java.time.LocalDateTime;
 
 public class OutgoingFlight extends Flight {
-	public OutgoingFlight(String airline, String flightNumber, String destinationCity, LocalDateTime flightTime,
-			int terminal) {
-		super(airline, flightNumber, destinationCity, flightTime, terminal);
+	public OutgoingFlight(String airline, String flightNumber, String destinationCity, String country, String airport,
+			LocalDateTime flightTime, int terminal) {
+		super(airline, flightNumber, destinationCity, country, airport, flightTime, terminal);
 	}
 
 	@Override
