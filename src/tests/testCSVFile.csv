@@ -1,3 +1,3 @@
-Airline,Flight Number,Year,Month,Day,Hour,Minute,City,Terminal,Direction
-Elal,LY0001,New York,2020,05,20,00,45,3,INCOMING
-Elal,LY0315,London,2020,05,20,10,10,3,OUTGOING
+Airline,Flight Number,Country,City,Airport,Year,Month,Day,Hour,Minute,Terminal,Direction
+Elal,LY0001,United States,New York,John F Kennedy,2020,05,20,00,45,3,INCOMING
+Elal,LY0315,England,London,Heathrow,2020,05,20,10,10,3,OUTGOING

@@ -226,6 +226,16 @@ public class UIHandler {
 				.collect(Collectors.toList());
 	}
 
+	private List<Flight> filterByCountry(String name, List<Flight> flightList) {
+		return flightList.stream().filter(flight -> flight.getCountry().equalsIgnoreCase(name))
+				.collect(Collectors.toList());
+	}
+
+	private List<Flight> filterByAirport(String name, List<Flight> flightList) {
+		return flightList.stream().filter(flight -> flight.getAirport().equalsIgnoreCase(name))
+				.collect(Collectors.toList());
+	}
+
 	private List<Flight> filterByAirline(String name, List<Flight> flightList) {
 		return flightList.stream().filter(flight -> flight.getAirline().equalsIgnoreCase(name))
 				.collect(Collectors.toList());
@@ -241,6 +251,11 @@ public class UIHandler {
 		return flightList.stream().filter(flight -> flight.getFlightTime().compareTo(dateTimeBuilder) >= 0)
 				.collect(Collectors.toList());
 
+	}
+
+	private List<Flight> filterFlightsByDayOfWeek(List<Flight> flightList, String dayOfWeek) {
+		return flightList.stream().filter(flight -> flight.getDayOfWeek().equalsIgnoreCase(dayOfWeek))
+				.collect(Collectors.toList());
 	}
 
 	public ArrayList<Flight> filterByArguments(String[] args) {
@@ -293,6 +308,22 @@ public class UIHandler {
 				printErr("Invalid city name.");
 		}
 
+		value = map.get("country");
+		if (value != null) {
+			if (value.matches(VALID_NAME))
+				filteredFlights = filterByCountry(value, filteredFlights);
+			else
+				printErr("Invalid country name.");
+		}
+
+		value = map.get("airport");
+		if (value != null) {
+			if (value.matches(VALID_NAME))
+				filteredFlights = filterByAirport(value, filteredFlights);
+			else
+				printErr("Invalid airport name.");
+		}
+
 		value = map.get("terminal");
 		if (value != null) {
 			try {
@@ -316,6 +347,14 @@ public class UIHandler {
 			else
 				printErr("Invalid direction.");
 		}
+
+		value = map.get("day_of_week");
+		if (value != null) {
+			String[] days = value.split(",");
+			for (String day : days)
+				filteredFlights = filterFlightsByDayOfWeek(filteredFlights, day);
+		}
+		
 		this.filteredFlights = new TreeSet<Flight>(filteredFlights);
 		return filteredFlights;
 	}
@@ -405,8 +444,8 @@ public class UIHandler {
 
 	private String flightToCommaSeparatedValue(Flight flight) {
 		String direction = flight.getClass().getSimpleName().replace("Flight", "").toUpperCase();
-		return String.format("%s,%s,%s,%s,%s,%s,%s,%s", flight.getAirline(), flight.getFlightNumber(), flight.getCity(),
-				flight.getCountry(), flight.getAirport(),
+		return String.format("%s,%s,%s,%s,%s,%s,%s,%s", flight.getAirline(), flight.getFlightNumber(),
+				flight.getCountry(), flight.getCity(), flight.getAirport(),
 				flight.getFlightTime().format(DateTimeFormatter.ofPattern("yyyy,MM,dd,HH,mm")), flight.getTerminal(),
 				direction);
 	}
@@ -415,8 +454,8 @@ public class UIHandler {
 		String[] values = line.split(",");
 		String airline = values[0];
 		String flightNumber = values[1];
-		String city = values[2];
-		String country = values[3];
+		String country = values[2];
+		String city = values[3];
 		String airport = values[4];
 		int year = Integer.parseInt(values[5]);
 		int month = Integer.parseInt(values[6]);
@@ -464,7 +503,7 @@ public class UIHandler {
 			pw = new PrintWriter(file);
 
 			StringBuilder sb = new StringBuilder(
-					"Airline,Flight Number,Year,Month,Day,Hour,Minute,City,Terminal,Direction\n");
+					"Airline,Flight Number,Country,City,Airport,Year,Month,Day,Hour,Minute,Terminal,Direction\n");
 			for (Flight flight : flights) {
 				sb.append(flightToCommaSeparatedValue(flight) + "\n");
 			}

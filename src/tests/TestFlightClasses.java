@@ -28,7 +28,7 @@ class TestFlightClasses {
 
 		Flight newYork = new IncomingFlight("Elal", "LY1", "New York", "United States", "John F Kennedy",
 				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
-		String expectedNewYorkToString = "Elal flight number LY0001, coming from New York; scheduled time: 2020/05/20 00:45, at terminal 3";
+		String expectedNewYorkToString = "Elal flight number LY0001, coming from New York, United States, John F Kennedy airport; scheduled time: 2020/05/20 00:45, TLV terminal 3";
 
 		assertEquals(expectedNewYorkToString, newYork.toString());
 	}
@@ -38,8 +38,7 @@ class TestFlightClasses {
 
 		Flight london = new OutgoingFlight("Elal", "LY315", "London", "England", "Heathrow",
 				LocalDateTime.of(2020, 05, 20, 10, 10), 3);
-		String expectedLondonToString = "Elal flight number LY0315, departing to London; scheduled time: 2020/05/20 10:10, at terminal 3";
-
+		String expectedLondonToString = "Elal flight number LY0315, departing to London, England, Heathrow airport; scheduled time: 2020/05/20 10:10, TLV terminal 3";
 		assertEquals(expectedLondonToString, london.toString());
 	}
 

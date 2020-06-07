@@ -70,6 +70,10 @@ public abstract class Flight implements Comparable<Flight> {
 		return flightTime;
 	}
 
+	public String getDayOfWeek() {
+		return flightTime.getDayOfWeek().toString();
+	}
+
 	private Boolean setFlightTime(LocalDateTime flightTime) {
 		this.flightTime = LocalDateTime.from(flightTime);
 		return true;
@@ -135,8 +139,8 @@ public abstract class Flight implements Comparable<Flight> {
 	@Override
 	public String toString() {
 		return String.format(
-				"%s flight number %s, departing to/coming from %s , %s, $s; scheduled time: %s, at terminal %d",
-				airline, flightNumber, airport, city, country,
+				"%s flight number %s, departing to/coming from %s, %s, %s airport; scheduled time: %s, TLV terminal %d",
+				airline, flightNumber, city, country, airport,
 				flightTime.format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")), terminal);
 	}
 }

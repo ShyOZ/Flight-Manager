@@ -1,8 +1,9 @@
-Airline,Flight Number,Year,Month,Day,Hour,Minute,City,Terminal,Direction
-Elal,LY0001,New York,2020,05,10,00,45,3,INCOMING
-Elal,LY0001,London,2020,05,20,00,45,3,INCOMING
-Elal,LY0001,New York,2020,05,20,00,45,1,INCOMING
-Elal,LY0001,New York,2020,05,20,00,45,3,INCOMING
-Elal,LY0001,New York,2020,05,20,00,45,3,OUTGOING
-Turkish,LY0001,New York,2021,06,15,00,45,3,INCOMING
-Elal,LY0001,New York,2022,11,10,00,45,3,INCOMING
+Airline,Flight Number,Country,City,Airport,Year,Month,Day,Hour,Minute,Terminal,Direction
+Elal,LY0001,United States,New York,John F Kennedy,2020,5,10,0,45,3,INCOMING
+Elal,LY0001,England,London,Heathrow,2020,5,20,0,45,3,INCOMING
+Elal,LY0001,United States,New York,John F Kennedy,2020,5,20,0,45,1,INCOMING
+Elal,LY0001,United States,New York,John F Kennedy,2020,5,20,0,45,3,INCOMING
+Elal,LY0001,United States,New York,John F Kennedy,2020,5,20,0,45,3,OUTGOING
+Turkish,LY0001,United States,New York,John F Kennedy,2021,6,15,0,45,3,INCOMING
+Elal,LY0001,United States,New York,John F Kennedy,2022,11,10,0,45,3,INCOMING
+ELal,LY0001,France,Marseille,Marseille,2020,6,14,0,45,3,OUTGOING

@@ -57,6 +57,8 @@ class TestUIHandler {
 		input.append("2021\n12\n02\n20\n21\n"); // date
 		input.append(flightType + "\n"); // IN = incoming flight, OUT = outgoing flight
 		input.append("Testing Grounds\n"); // city
+		input.append("Test Country\n"); // Country
+		input.append("Test Airport\n"); // Airport
 		input.append("3\n"); // terminal
 		Scanner testScanner = new Scanner(input.toString());
 
@@ -81,9 +83,9 @@ class TestUIHandler {
 		handler.saveAllToFile(TEST_FILE_PATH);
 
 		StringBuilder expectedCSVContent = new StringBuilder();
-		expectedCSVContent.append("Airline,Flight Number,Year,Month,Day,Hour,Minute,City,Terminal,Direction\n");
-		expectedCSVContent.append("Elal,LY0001,New York,2020,05,20,00,45,3,INCOMING\n");
-		expectedCSVContent.append("Elal,LY0315,London,2020,05,20,10,10,3,OUTGOING\n");
+		expectedCSVContent.append("Airline,Flight Number,Country,City,Airport,Year,Month,Day,Hour,Minute,Terminal,Direction\n");
+		expectedCSVContent.append("Elal,LY0001,United States,New York,John F Kennedy,2020,05,20,00,45,3,INCOMING\n");
+		expectedCSVContent.append("Elal,LY0315,England,London,Heathrow,2020,05,20,10,10,3,OUTGOING\n");
 
 		StringBuilder actualCSVContent = new StringBuilder();
 		Scanner scanner = new Scanner(new File(TEST_FILE_PATH));
@@ -164,6 +166,10 @@ class TestUIHandler {
 		// This flight is filtered by Direction.
 		Flight testFlight7FilteredByDirection = new OutgoingFlight("Elal", "LY1", "New York", "United States",
 				"John F Kennedy", LocalDateTime.of(2020, 05, 20, 00, 45), 3);
+		Flight testFlight8FilteredByCountry = new IncomingFlight("Elal", "LY1", "New York", "United Freedom", "John F Kennedy",
+				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
+		Flight testFlight9FilteredByAirport = new IncomingFlight("Elal", "LY1", "New York", "United States", "Newark",
+				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
 		handler.addFlight(testFlight1);
 		handler.addFlight(testFlight2FilteredAfter);
 		handler.addFlight(testFlight3FilteredBefore);
@@ -171,8 +177,10 @@ class TestUIHandler {
 		handler.addFlight(testFlight5FilteredByCity);
 		handler.addFlight(testFlight6FilteredByTerminal);
 		handler.addFlight(testFlight7FilteredByDirection);
-		String[] args = { "after-2020/05/16 00:00", "before-2022/10/10 00:00", "airline-Elal", "city-New York",
-				"terminal-3", "direction-incoming" };
+		handler.addFlight(testFlight8FilteredByCountry);
+		handler.addFlight(testFlight9FilteredByAirport);
+		String[] args = { "from-2020/05/16 00:00", "to-2022/10/10 00:00", "airline-Elal", "city-New York",
+				"terminal-3", "direction-arrivals" };
 		ArrayList<Flight> testList = handler.filterByArguments(args);
 		for (Flight flight : testList) {
 			System.out.println(flight);
