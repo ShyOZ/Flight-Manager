@@ -174,6 +174,7 @@ public class UIHandler {
 			flightList = filterFlightsFrom(flightList, laterThan);
 			break;
 		}
+
 		boolean answer = (getValidString(YES_NO_QUESTION, "Would you like to filter by airline? [Y|N]", scanner)
 				.equalsIgnoreCase("Y"));
 		if (answer) {
@@ -253,9 +254,13 @@ public class UIHandler {
 
 	}
 
-	private List<Flight> filterFlightsByDayOfWeek(List<Flight> flightList, String dayOfWeek) {
-		return flightList.stream().filter(flight -> flight.getDayOfWeek().equalsIgnoreCase(dayOfWeek))
-				.collect(Collectors.toList());
+	private List<Flight> filterFlightsByDayOfWeek(List<Flight> flightList, String[] daysOfWeek) {
+		return flightList.stream().filter(flight -> {
+			for (String day : daysOfWeek)
+				if (flight.getDayOfWeek().equalsIgnoreCase(day))
+					return true;
+			return false;
+		}).collect(Collectors.toList());
 	}
 
 	public ArrayList<Flight> filterByArguments(String[] args) {
@@ -354,7 +359,7 @@ public class UIHandler {
 			for (String day : days)
 				filteredFlights = filterFlightsByDayOfWeek(filteredFlights, day);
 		}
-		
+
 		this.filteredFlights = new TreeSet<Flight>(filteredFlights);
 		return filteredFlights;
 	}
