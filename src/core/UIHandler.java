@@ -356,8 +356,7 @@ public class UIHandler {
 		value = map.get("day_of_week");
 		if (value != null) {
 			String[] days = value.split(",");
-			for (String day : days)
-				filteredFlights = filterFlightsByDayOfWeek(filteredFlights, day);
+				filteredFlights = filterFlightsByDayOfWeek(filteredFlights, days);
 		}
 
 		this.filteredFlights = new TreeSet<Flight>(filteredFlights);
