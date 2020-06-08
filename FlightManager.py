@@ -1,6 +1,6 @@
 import subprocess
 import datetime
-
+import pathlib
 
 from flask import Flask, request
 
@@ -15,16 +15,29 @@ def run():
     def flights(direction):
         arguments = [f"direction-{direction}"]
         if len(request.args) > 0:
-            options = ["airline", "city", "terminal", "country", "airport","day_of_week"]
+            options = ["airline","city","terminal","country","airport","day_of_week"]
             fromdate = ["day1", "month1", "year1"]
             todate = ["day2", "month2", "year2"]
-            
+            try:
+                date1_str = f'{request.args.get("year1")} {request.args.get("month1")} {request.args.get("day1")} 00:00'
+                date1_str = (datetime.datetime.strptime(date1_str, "%Y %m %d %H:%M")).strftime("%Y/%m/%d %H:%M")
+                arguments+=["from-"+date1_str]
+            except:
+                ...
+            try:
+                date2_str = f'{request.args.get("year2")} {request.args.get("month2")} {request.args.get("day2")} 00:00'
+                date2_str = (datetime.datetime.strptime(date2_str, "%Y %m %d %H:%M")).strftime("%Y/%m/%d %H:%M")
+                arguments+=["to-"+date2_str]
+            except:
+                ...
             for option in options:
                 answer = request.args.get(option)
                 if answer is not None:
                     arguments += [option + "-" + answer]
-
+                    
+        path_to_folder = str(pathlib.Path(__file__).parent.absolute())  
         return subprocess.check_output(["java", "-cp", "bin", "core.FlightManager"] + arguments)
+       
 
     @app.route("/departures")
     def departures():
@@ -38,4 +51,5 @@ def run():
 
 
 if __name__ == "__main__":
+    subprocess.run(["javac","-d","bin","src/core/*.java"])
     run()
