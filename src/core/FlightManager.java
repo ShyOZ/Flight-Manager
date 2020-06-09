@@ -3,14 +3,24 @@ package core;
 import java.util.Scanner;
 
 public class FlightManager {
-	protected static boolean cmdVersion;
+	protected static String runVersion = "normal";
 
 	public static void main(String[] args) {
-		cmdVersion = args.length > 0;
+		for(String arg : args) {
+			if (arg.startsWith("outformat")) {
+				runVersion = arg.replace("outformat-", "");
+				if (!(runVersion.equalsIgnoreCase("HTML") || runVersion.equalsIgnoreCase("text"))) {
+					runVersion = "normal";
+				}
+				break;
+			}
+		}
+		
 		UIHandler handler = new UIHandler();
-		if (!cmdVersion) {
+		if (runVersion.equalsIgnoreCase("normal")) {
 			Scanner scanner = new Scanner(System.in);
 			int choice;
+			
 			do {
 				choice = handler.showMenu(scanner);
 				switch (choice) {

@@ -283,7 +283,7 @@ public class UIHandler {
 				LocalDateTime date = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"));
 				filteredFlights = filterFlightsFrom(filteredFlights, date);
 			} catch (Exception e) {
-				printErr("The date string " + value + " is not of the format \"yyyy/MM/dd HH:mm\".");
+				System.err.println("The date string " + value + " is not of the format \"yyyy/MM/dd HH:mm\".");
 			}
 		}
 
@@ -293,7 +293,7 @@ public class UIHandler {
 				LocalDateTime date = LocalDateTime.parse(value, DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"));
 				filteredFlights = filterFlightsTo(filteredFlights, date);
 			} catch (Exception e) {
-				printErr("The date string " + value + " is not of the format \"yyyy/MM/dd HH:mm\".");
+				System.err.println("The date string " + value + " is not of the format \"yyyy/MM/dd HH:mm\".");
 			}
 		}
 
@@ -302,7 +302,7 @@ public class UIHandler {
 			if (value.matches(VALID_NAME))
 				filteredFlights = filterByAirline(value, filteredFlights);
 			else
-				printErr("Invalid airline name.");
+				System.err.println("Invalid airline name.");
 		}
 
 		value = map.get("city");
@@ -310,7 +310,7 @@ public class UIHandler {
 			if (value.matches(VALID_NAME))
 				filteredFlights = filterByCity(value, filteredFlights);
 			else
-				printErr("Invalid city name.");
+				System.err.println("Invalid city name.");
 		}
 
 		value = map.get("country");
@@ -318,7 +318,7 @@ public class UIHandler {
 			if (value.matches(VALID_NAME))
 				filteredFlights = filterByCountry(value, filteredFlights);
 			else
-				printErr("Invalid country name.");
+				System.err.println("Invalid country name.");
 		}
 
 		value = map.get("airport");
@@ -326,7 +326,7 @@ public class UIHandler {
 			if (value.matches(VALID_NAME))
 				filteredFlights = filterByAirport(value, filteredFlights);
 			else
-				printErr("Invalid airport name.");
+				System.err.println("Invalid airport name.");
 		}
 
 		value = map.get("terminal");
@@ -334,29 +334,30 @@ public class UIHandler {
 			try {
 				int terminalNumber = Integer.parseInt(value);
 				if (terminalNumber < 0 || numOfTerminals < terminalNumber)
-					printErr("Invalid terminal input (integer not in range).");
+					System.err.println("Invalid terminal input (integer not in range).");
 				else
 					filteredFlights = filterByTerminal(terminalNumber, filteredFlights);
 
 			} catch (Exception e) {
-				printErr("Invalid terminal input (not an integer).");
+				System.err.println("Invalid terminal input (not an integer).");
 			}
 		}
 
 		value = map.get("direction");
+
 		if (value != null) {
 			if (value.equalsIgnoreCase("arrivals"))
 				filteredFlights = filterByInOut(filteredFlights, IncomingFlight.class);
 			else if (value.equalsIgnoreCase("departures"))
 				filteredFlights = filterByInOut(filteredFlights, OutgoingFlight.class);
-			else
-				printErr("Invalid direction.");
+			if (!(value.equalsIgnoreCase("all")))
+				System.err.println("Invalid direction.");
 		}
 
 		value = map.get("day_of_week");
 		if (value != null) {
 			String[] days = value.split(",");
-				filteredFlights = filterFlightsByDayOfWeek(filteredFlights, days);
+			filteredFlights = filterFlightsByDayOfWeek(filteredFlights, days);
 		}
 
 		this.filteredFlights = new TreeSet<Flight>(filteredFlights);
@@ -599,16 +600,24 @@ public class UIHandler {
 			scanner.close();
 			return flights;
 		} catch (FileNotFoundException e) {
-			printErr("File not found!");
+			System.err.println("File not found!");
 			return null;
 		}
 	}
 
 	private <T> void println(T s) {
-		System.out.println(FlightManager.cmdVersion ? s + "<br>" : s);
+		// System.out.println(FlightManager.cmdVersion ? s + "<br>" : s);
+		if (FlightManager.runVersion.equalsIgnoreCase("HTML"))
+			System.out.print(s + "<br>");
+		else
+			System.out.println(s);
 	}
 
-	private <T> void printErr(T s) {
-		System.err.println(FlightManager.cmdVersion ? s + "<br>" : s);
-	}
+	// redundant
+	/*
+	 * private <T> void System.err.println(T s) {
+	 * //System.err.println(FlightManager.cmdVersion ? s + "<br>" : s); if
+	 * (FlightManager.runVersion.equalsIgnoreCase("HTML")) System.err.print(s +
+	 * "<br>"); else System.err.println(s); }
+	 */
 }

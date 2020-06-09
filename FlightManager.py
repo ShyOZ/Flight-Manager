@@ -15,9 +15,19 @@ def run():
     def flights(direction):
         arguments = [f"direction-{direction}"]
         if len(request.args) > 0:
-            options = ["airline","city","terminal","country","airport","day_of_week"]
-            fromdate = ["day1", "month1", "year1"]
-            todate = ["day2", "month2", "year2"]
+            options = ["outformat","airline","city","terminal","country","airport"]
+            days = ["sunday","monday","tuesday","wednesday","thursday","friday","saturday"]
+            day_of_week = ""
+            for day in days:
+                answer = request.args.get(day)
+                if answer is True:
+                    if day_of_week == "":
+                        day_of_week = "day_of_week-" + day
+                    else:
+                        day_of_week += "," + day
+            if day_of_week != "":
+                arguments += [day_of_week]
+                    
             try:
                 date1_str = f'{request.args.get("year1")} {request.args.get("month1")} {request.args.get("day1")} 00:00'
                 date1_str = (datetime.datetime.strptime(date1_str, "%Y %m %d %H:%M")).strftime("%Y/%m/%d %H:%M")
@@ -35,8 +45,9 @@ def run():
                 if answer is not None:
                     arguments += [option + "-" + answer]
                     
-        path_to_folder = str(pathlib.Path(__file__).parent.absolute())  
-        return subprocess.check_output(["java", "-cp", "bin", "core.FlightManager"] + arguments)
+        path_to_folder = str(pathlib.Path(__file__).parent.absolute())
+        return subprocess.check_output(["java", "-cp", "bin",
+        "core.FlightManager"] + arguments)
        
 
     @app.route("/departures")
@@ -46,6 +57,9 @@ def run():
     @app.route("/arrivals")
     def arrivals():
         return flights("arrivals")
+    @app.route("/all")
+    def all():
+        return flights("all")
 
     app.run(host="0.0.0.0", port=8000)
 
