@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+	<head>
+        <title>Flight From</title>
+        </head>
+    <body>
+	<form action="#" method="post">
+		<div>
+			<input type="radio" name="direction" value="arrivals" checked> <label>Arrivals</label><br>
+			<input type="radio" name="direction" value="departues"> <label>Departues</label>
+			<input type="radio" name="direction" value="any"> <label>All</label>
+		</div>
+
+		<div>
+			<label>Airline: </label>
+			<input type="text" name="airline">
+		</div>
+		<div>
+			<label>Flight Number: </label> 
+			<input type="text" name="flightnumber">
+		</div>
+		<div> 
+			<label>Country: </label>
+			<input type="text" name="country">
+		</div>
+		<div>   
+			<label>City: </label>
+			<input type="text" name="city">
+		</div>
+		<div> 
+			<label>Airport: </label>
+			<input type="text" name="airport">
+		</div>
+		<div>
+			<label>Day of week: </label><br>
+			{% for day in ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"] %}
+				<input type="checkbox" name="{{day}}" value="{{day}}">
+				<label>{{day}}</label>
+			{% endfor %}
+
+		</div>
+		<div> 
+			<label>From date: </label>
+			<input type="date" name="startdate" format="YYYY MM DD">
+			
+		</div>
+		<div> 
+			<label>To date: </label>
+			<input type=date name="enddate" format="YYYY MM DD">
+		</div>
+		<div>
+			<input type=submit value-"submit">
+		</div>
+	</form>	
+    </body>
+</html>
