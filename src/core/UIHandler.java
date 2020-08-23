@@ -7,7 +7,6 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
@@ -75,6 +74,7 @@ public class UIHandler {
 		return getValidInt(0, 5, "Enter your choice", scanner);
 	}
 
+	// Add an existing flight
 	public boolean addFlight(Flight newFlight) {
 		if (!allFlights.add(newFlight))
 			return false;
@@ -82,10 +82,12 @@ public class UIHandler {
 				: outgoingFlights.add((OutgoingFlight) newFlight);
 	}
 
+	// Generates a new flight and adds it using console
 	public boolean addNewFlight(Scanner scanner) {
 		return addFlight(generateNewFlight(scanner));
 	}
 
+	// Generate a new flight using console
 	public Flight generateNewFlight(Scanner scanner) {
 		String airline;
 		String flightNumber;
@@ -121,6 +123,15 @@ public class UIHandler {
 				: new OutgoingFlight(airline, flightNumber, city, country, airport, flightTime, terminal);
 	}
 
+	/**
+	 * General purpose function for receiving String value from user with scanner
+	 * 
+	 * @param regex   - the regular expression, i.e. the format of the requires
+	 *                string.
+	 * @param message - the instruction message shown to the user.
+	 * @param scanner - the {@code Scanner} object used for input,
+	 * @return the user's valid string
+	 */
 	private String getValidString(String regex, String message, Scanner scanner) {
 		while (true) {
 			println(message);
@@ -132,6 +143,7 @@ public class UIHandler {
 		}
 	}
 
+	// Generate a new LocalDateTime variable
 	private LocalDateTime dateTimeBuilder(Scanner scanner) {
 		while (true) {
 			int year = getValidInt(2000, 2030, "What year?", scanner);
@@ -145,13 +157,14 @@ public class UIHandler {
 	}
 
 	public ArrayList<Flight> showFlightsByFilter(Scanner scanner) {
-		// Function that receives a list of all flights here
 		List<Flight> flightList = new ArrayList<>(allFlights);
 		println("Would you like to filter by Time?");
 		println("0: No");
 		println("1: All flights before a certain date");
 		println("2: All flights after a certain date");
 		println("3: All flights in a certain range");
+
+		// user choice for filtering by date / time
 		int choice = getValidInt(0, 3, "Enter your choice", scanner);
 		switch (choice) {
 		case 1:
@@ -175,6 +188,7 @@ public class UIHandler {
 			break;
 		}
 
+		// filtering menu by other means
 		boolean answer = (getValidString(YES_NO_QUESTION, "Would you like to filter by airline? [Y|N]", scanner)
 				.equalsIgnoreCase("Y"));
 		if (answer) {
@@ -213,6 +227,7 @@ public class UIHandler {
 		return (ArrayList<Flight>) flightList;
 	}
 
+	// Filter of Direction
 	private List<Flight> filterByInOut(List<Flight> flightList, Class<? extends Flight> flightType) {
 		return flightList.stream().filter(flight -> flight.getClass().equals(flightType)).collect(Collectors.toList());
 	}
@@ -242,12 +257,14 @@ public class UIHandler {
 				.collect(Collectors.toList());
 	}
 
+	// Filter by upper bound date
 	private List<Flight> filterFlightsTo(List<Flight> flightList, LocalDateTime dateTimeBuilder) {
 		return flightList.stream().filter(flight -> flight.getFlightTime().compareTo(dateTimeBuilder) <= 0)
 				.collect(Collectors.toList());
 
 	}
 
+	// Filter by lower bound date
 	private List<Flight> filterFlightsFrom(List<Flight> flightList, LocalDateTime dateTimeBuilder) {
 		return flightList.stream().filter(flight -> flight.getFlightTime().compareTo(dateTimeBuilder) >= 0)
 				.collect(Collectors.toList());
@@ -267,6 +284,14 @@ public class UIHandler {
 		return (ArrayList<Flight>) filterByArguments(new ArrayList<Flight>(allFlights), args);
 	}
 
+	/**
+	 * the function receives a flight list and array of filter arguments and returns
+	 * a filtered list. also sets the filtered flights property for future uses.
+	 * 
+	 * @param flightList - the flight list to be filtered
+	 * @param args       - the list of arguments to use for filtering
+	 * @return The Filtered Flight List
+	 */
 	private List<Flight> filterByArguments(List<Flight> flightList, String[] args) {
 		List<Flight> filteredFlights = flightList;
 		String value;
@@ -419,27 +444,22 @@ public class UIHandler {
 		}
 	}
 
-	// no need to test
 	public void showAllFlights() {
 		showFlightList(allFlights);
 	}
 
-	// no need to test
 	public void showIncomingFlights() {
 		showFlightList(incomingFlights);
 	}
 
-	// no need to test
 	public void showOutgoingFlights() {
 		showFlightList(outgoingFlights);
 	}
 
-	// no need to test
 	public void showFilteredFlights() {
 		showFlightList(filteredFlights);
 	}
 
-	// no need to test
 	private void showFlightList(Set<Flight> wantedList) {
 		if (wantedList.isEmpty())
 			println("Empty flight list!");
@@ -447,6 +467,7 @@ public class UIHandler {
 			println(flight);
 	}
 
+	// return a string value of a flight for saving inside CSV based DB.
 	private String flightToCommaSeparatedValue(Flight flight) {
 		String direction = flight.getClass().getSimpleName().replace("Flight", "").toUpperCase();
 		return String.format("%s,%s,%s,%s,%s,%s,%s,%s", flight.getAirline(), flight.getFlightNumber(),
@@ -455,6 +476,7 @@ public class UIHandler {
 				direction);
 	}
 
+	// reverse of above.
 	private Flight commaSeparatedValueToFlight(String line) {
 		String[] values = line.split(",");
 		String airline = values[0];
@@ -606,18 +628,9 @@ public class UIHandler {
 	}
 
 	private <T> void println(T s) {
-		// System.out.println(FlightManager.cmdVersion ? s + "<br>" : s);
 		if (FlightManager.runVersion.equalsIgnoreCase("HTML"))
 			System.out.print(s + "<br>");
 		else
 			System.out.println(s);
 	}
-
-	// redundant
-	/*
-	 * private <T> void System.err.println(T s) {
-	 * //System.err.println(FlightManager.cmdVersion ? s + "<br>" : s); if
-	 * (FlightManager.runVersion.equalsIgnoreCase("HTML")) System.err.print(s +
-	 * "<br>"); else System.err.println(s); }
-	 */
 }

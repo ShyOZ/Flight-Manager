@@ -102,6 +102,8 @@ public abstract class Flight implements Comparable<Flight> {
 	// Methods
 	@Override
 	public int compareTo(Flight other) {
+		// Compares [this] flight to another flight, by time, airline, flight number, city, and terminal
+		// Returns -1, 0 or 1 depending on the aforementioned parameters by order to determined lexicographic order
 		int comparedFlightTime = flightTime.compareTo(other.flightTime);
 		if (comparedFlightTime == 0) {
 			int comparedAirline = airline.compareTo(other.airline);
@@ -127,6 +129,7 @@ public abstract class Flight implements Comparable<Flight> {
 
 	@Override
 	public boolean equals(Object obj) {
+		// Compare [this] flight to another flight, and returns true if all properties are equal.
 		if (!(obj instanceof Flight))
 			return false;
 		Flight other = (Flight) obj;
