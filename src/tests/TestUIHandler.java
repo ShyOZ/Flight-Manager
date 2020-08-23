@@ -61,7 +61,6 @@ class TestUIHandler {
 		input.append("Test Airport\n"); // Airport
 		input.append("3\n"); // terminal
 		Scanner testScanner = new Scanner(input.toString());
-
 		Flight expectedFlight = (flightType.contentEquals("IN"))
 				? new IncomingFlight("Test Airline", "TST0101", "Testing Grounds", "Test Country", "Test Airport",
 						LocalDateTime.of(2021, 12, 02, 20, 21), 3)
@@ -81,20 +80,17 @@ class TestUIHandler {
 		handler.addFlight(newYorkIn);
 		handler.addFlight(londonOut);
 		handler.saveAllToFile(TEST_FILE_PATH);
-
-		StringBuilder expectedCSVContent = new StringBuilder();
-		expectedCSVContent
+		StringBuilder expectedCSV = new StringBuilder();
+		expectedCSV
 				.append("Airline,Flight Number,Country,City,Airport,Year,Month,Day,Hour,Minute,Terminal,Direction\n");
-		expectedCSVContent.append("Elal,LY0001,United States,New York,John F Kennedy,2020,05,20,00,45,3,INCOMING\n");
-		expectedCSVContent.append("Elal,LY0315,England,London,Heathrow,2020,05,20,10,10,3,OUTGOING\n");
-
+		expectedCSV.append("Elal,LY0001,United States,New York,John F Kennedy,2020,05,20,00,45,3,INCOMING\n");
+		expectedCSV.append("Elal,LY0315,England,London,Heathrow,2020,05,20,10,10,3,OUTGOING\n");
 		StringBuilder actualCSVContent = new StringBuilder();
 		Scanner scanner = new Scanner(new File(TEST_FILE_PATH));
 		while (scanner.hasNextLine()) {
 			actualCSVContent.append(scanner.nextLine() + "\n");
 		}
-
-		assertEquals(expectedCSVContent.toString(), actualCSVContent.toString());
+		assertEquals(expectedCSV.toString(), actualCSVContent.toString());
 		handler.loadFromFile(TEST_FILE_PATH);
 		TreeSet<Flight> tree = new TreeSet<Flight>();
 		tree.add(newYorkIn);
@@ -136,9 +132,6 @@ class TestUIHandler {
 		Scanner scanner = new Scanner(input);
 
 		ArrayList<Flight> testList = handler.showFlightsByFilter(scanner);
-		for (Flight flight : testList) {
-			System.out.println(flight);
-		}
 		ArrayList<Flight> expectedList = new ArrayList<>();
 		expectedList.add(testFlight1);
 		assertEquals(expectedList, testList);
@@ -183,9 +176,6 @@ class TestUIHandler {
 		String[] args = { "from-2020/05/16 00:00", "to-2022/10/10 00:00", "airline-Elal", "city-New York", "terminal-3",
 				"direction-arrivals" };
 		ArrayList<Flight> testList = handler.filterByArguments(args);
-		for (Flight flight : testList) {
-			System.out.println(flight);
-		}
 		ArrayList<Flight> expectedList = new ArrayList<>();
 		expectedList.add(testFlight1);
 		assertEquals(expectedList, testList);

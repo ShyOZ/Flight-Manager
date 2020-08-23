@@ -25,17 +25,14 @@ class TestFlightClasses {
 
 	@Test
 	public void testIncomingFlightToString() {
-
 		Flight newYork = new IncomingFlight("Elal", "LY1", "New York", "United States", "John F Kennedy",
 				LocalDateTime.of(2020, 05, 20, 00, 45), 3);
 		String expectedNewYorkToString = "Elal flight number LY0001, coming from New York, United States, John F Kennedy airport; scheduled time: 2020/05/20 00:45, TLV terminal 3";
-
 		assertEquals(expectedNewYorkToString, newYork.toString());
 	}
 
 	@Test
 	public void testOutgoingFlightToString() {
-
 		Flight london = new OutgoingFlight("Elal", "LY315", "London", "England", "Heathrow",
 				LocalDateTime.of(2020, 05, 20, 10, 10), 3);
 		String expectedLondonToString = "Elal flight number LY0315, departing to London, England, Heathrow airport; scheduled time: 2020/05/20 10:10, TLV terminal 3";
@@ -56,12 +53,10 @@ class TestFlightClasses {
 	public void testFlightsAreEqualIfDifferentObjectButSameContent() {
 		Flight testIncomingFlight = new IncomingFlight("Test Airline", "TST101", "London", "England", "Heathrow",
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
-
 		Flight testOutgoingFlight = new OutgoingFlight("Test Airline", "TST101", "London", "England", "Heathrow",
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
 		Flight testContentEqualsAndSameIncomingType = new IncomingFlight("Test Airline", "TST101", "London", "England",
 				"Heathrow", LocalDateTime.of(2022, 2, 2, 2, 2), 3);
-
 		Flight testContentEqualsAndSameOutgoingType = new OutgoingFlight("Test Airline", "TST101", "London", "England",
 				"Heathrow", LocalDateTime.of(2022, 2, 2, 2, 2), 3);
 		assumeTrue(testIncomingFlight.equals(testContentEqualsAndSameIncomingType));
@@ -72,7 +67,6 @@ class TestFlightClasses {
 	public void testFlightNotEqualToSomeObject() {
 		Flight testIncomingFlight = new IncomingFlight("Test Airline", "TST101", "London", "England", "Heathrow",
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
-
 		Flight testOutgoingFlight = new OutgoingFlight("Test Airline", "TST101", "London", "England", "Heathrow",
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
 		assumeFalse(testIncomingFlight.equals(new Object()));
@@ -81,7 +75,6 @@ class TestFlightClasses {
 
 	@Test
 	public void testIncomingFlightNotEqualsToOutgoingFlight() {
-
 		IncomingFlight testFlight = new IncomingFlight("Test Airline", "TST101", "London", "England", "Heathrow",
 				LocalDateTime.of(2022, 2, 2, 2, 2), 3);
 		Flight testOutgoingFlight = new OutgoingFlight("Test Airline", "TST101", "London", "England", "Heathrow",
@@ -99,7 +92,6 @@ class TestFlightClasses {
 				LocalDateTime.of(2022, 2, 2, 2, 3), 3);
 		assumeFalse(testFlight.equals(testCompareFlightTime));
 		assertTrue(testFlight.compareTo(testCompareFlightTime) < 0);
-
 	}
 
 	@Test

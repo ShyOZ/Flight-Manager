@@ -24,7 +24,7 @@ public class UIHandler {
 	private int numOfTerminals;
 	private final static int BASE_NUM_OF_TERMINALS = 3;
 	private final String VALID_NAME = "[a-zA-Z ]+";
-	private final String VALID_FLIGHTNUMBER = "(^([A-Z]{0,3})([0-9]{1,4})$)";
+	private final String VALID_FLIGHT_NUMBER = "(^([A-Z]{0,3})([0-9]{1,4})$)";
 	private final String YES_NO_QUESTION = "Y|N";
 	private final String IN_OR_OUT = "IN|OUT";
 
@@ -99,24 +99,18 @@ public class UIHandler {
 		int terminal;
 
 		airline = getValidString(VALID_NAME, "Enter airline's name (letters and spaces only)", scanner);
-
-		flightNumber = getValidString(VALID_FLIGHTNUMBER, "Enter flight number (capital letters and numbers only)",
+		flightNumber = getValidString(VALID_FLIGHT_NUMBER, "Enter flight number (capital letters and numbers only)",
 				scanner);
-
 		println("Enter the time of departure");
 		flightTime = dateTimeBuilder(scanner);
-
 		incoming = (getValidString(IN_OR_OUT, "Is the flight [IN] incoming or [OUT] outgoing?", scanner)
 				.equalsIgnoreCase("IN"));
 		String inOrOut = incoming ? "origin" : "destination";
-
 		city = getValidString(VALID_NAME, String.format("Enter %s city (letters and spaces only)", inOrOut), scanner);
-
 		country = getValidString(VALID_NAME, String.format("Enter %s country (letters and spaces only)", inOrOut),
 				scanner);
 		airport = getValidString(VALID_NAME, String.format("Enter %s airport (letters and spaces only)", inOrOut),
 				scanner);
-
 		terminal = getValidInt(1, numOfTerminals, "Enter terminal number", scanner);
 		scanner.nextLine();
 		return (incoming) ? new IncomingFlight(airline, flightNumber, city, country, airport, flightTime, terminal)
@@ -151,8 +145,8 @@ public class UIHandler {
 			int maxDayInMonth = YearMonth.of(year, month).lengthOfMonth();
 			int day = getValidInt(1, maxDayInMonth, "On what day?", scanner);
 			int hour = getValidInt(0, 23, "At what hour?", scanner);
-			int min = getValidInt(0, 59, "At what minute?", scanner);
-			return LocalDateTime.of(year, month, day, hour, min);
+			int minute = getValidInt(0, 59, "At what minute?", scanner);
+			return LocalDateTime.of(year, month, day, hour, minute);
 		}
 	}
 
@@ -222,7 +216,6 @@ public class UIHandler {
 			flightList = filterByInOut(flightList, OutgoingFlight.class);
 			break;
 		}
-
 		filteredFlights = new TreeSet<Flight>(flightList);
 		return (ArrayList<Flight>) flightList;
 	}
@@ -234,7 +227,6 @@ public class UIHandler {
 
 	private List<Flight> filterByTerminal(int choice, List<Flight> flightList) {
 		return flightList.stream().filter(flight -> flight.getTerminal() == choice).collect(Collectors.toList());
-
 	}
 
 	private List<Flight> filterByCity(String name, List<Flight> flightList) {
@@ -261,14 +253,12 @@ public class UIHandler {
 	private List<Flight> filterFlightsTo(List<Flight> flightList, LocalDateTime dateTimeBuilder) {
 		return flightList.stream().filter(flight -> flight.getFlightTime().compareTo(dateTimeBuilder) <= 0)
 				.collect(Collectors.toList());
-
 	}
 
 	// Filter by lower bound date
 	private List<Flight> filterFlightsFrom(List<Flight> flightList, LocalDateTime dateTimeBuilder) {
 		return flightList.stream().filter(flight -> flight.getFlightTime().compareTo(dateTimeBuilder) >= 0)
 				.collect(Collectors.toList());
-
 	}
 
 	private List<Flight> filterFlightsByDayOfWeek(List<Flight> flightList, String[] daysOfWeek) {
@@ -296,7 +286,6 @@ public class UIHandler {
 		List<Flight> filteredFlights = flightList;
 		String value;
 		TreeMap<String, String> map = new TreeMap<>();
-
 		for (String s : args) {
 			String[] keyValue = s.split("-");
 			if (keyValue.length == 2)
@@ -362,14 +351,12 @@ public class UIHandler {
 					System.err.println("Invalid terminal input (integer not in range).");
 				else
 					filteredFlights = filterByTerminal(terminalNumber, filteredFlights);
-
 			} catch (Exception e) {
 				System.err.println("Invalid terminal input (not an integer).");
 			}
 		}
 
 		value = map.get("direction");
-
 		if (value != null) {
 			if (value.equalsIgnoreCase("arrivals"))
 				filteredFlights = filterByInOut(filteredFlights, IncomingFlight.class);
@@ -407,24 +394,21 @@ public class UIHandler {
 	public int getValidInt(int min, int max, String message, Scanner scanner) {
 		if (min == max)
 			return min;
-		int n;
-
+		int input;
 		if (max < min) {
-			n = max;
+			input = max;
 			max = min;
-			min = n;
+			min = input;
 		}
-
 		String range = "";
-
 		if (max == Integer.MAX_VALUE) {
 			// [min, 'inf')
 			if (min != Integer.MIN_VALUE)
 				range = String.format("[at least %d]", min);
 		} // ('-inf',max]
-		else if (min == Integer.MIN_VALUE) {
+		else if (min == Integer.MIN_VALUE)
 			range = String.format("[at most %d]", max);
-		} else if (max - min == 1)
+		else if (max - min == 1)
 			range = String.format("[%d | %d]", min, max);
 		else
 			range = String.format("[%d - %d]", min, max);
@@ -432,12 +416,12 @@ public class UIHandler {
 		while (true) {
 			try {
 				println(message + " " + range);
-				n = scanner.nextInt();
-				while (n < min || max < n) {
+				input = scanner.nextInt();
+				while (input < min || max < input) {
 					println(message + " " + range);
-					n = scanner.nextInt();
+					input = scanner.nextInt();
 				}
-				return n;
+				return input;
 			} catch (InputMismatchException e) {
 				scanner.nextLine();
 			}
@@ -505,15 +489,15 @@ public class UIHandler {
 	}
 
 	public boolean saveAllToFile(String pathname) {
-		File f;
-		f = (pathname.endsWith(".csv")) ? new File(pathname) : new File(pathname + ".csv");
-		return saveAllToFile(f);
+		File file;
+		file = (pathname.endsWith(".csv")) ? new File(pathname) : new File(pathname + ".csv");
+		return saveAllToFile(file);
 	}
 
 	public boolean saveFilteredToFile(String pathname) {
-		File f;
-		f = (pathname.endsWith(".csv")) ? new File(pathname) : new File(pathname + ".csv");
-		return saveFilteredToFile(f);
+		File file;
+		file = (pathname.endsWith(".csv")) ? new File(pathname) : new File(pathname + ".csv");
+		return saveFilteredToFile(file);
 	}
 
 	public boolean saveAllToFile(File file) {
@@ -528,7 +512,6 @@ public class UIHandler {
 		PrintWriter pw;
 		try {
 			pw = new PrintWriter(file);
-
 			StringBuilder sb = new StringBuilder(
 					"Airline,Flight Number,Country,City,Airport,Year,Month,Day,Hour,Minute,Terminal,Direction\n");
 			for (Flight flight : flights) {
@@ -593,7 +576,6 @@ public class UIHandler {
 	 */
 	public void addFromFile(String pathname) {
 		File file = (pathname.endsWith(".csv")) ? new File(pathname) : new File(pathname + ".csv");
-
 		addFromFile(file);
 	}
 

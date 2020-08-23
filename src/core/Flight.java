@@ -32,13 +32,13 @@ public abstract class Flight implements Comparable<Flight> {
 	}
 
 	private boolean setFlightNumber(String flightNumber) {
-		Pattern p = Pattern.compile("(^([A-Z]{0,3})([0-9]{1,4})$)"); // 1-3 capital letters, 1-4 digits
-		Matcher m = p.matcher(flightNumber);
-		if (!m.find())
+		Pattern pattern = Pattern.compile("(^([A-Z]{0,3})([0-9]{1,4})$)"); // 1-3 capital letters, 1-4 digits
+		Matcher matcher = pattern.matcher(flightNumber);
+		if (!matcher.find())
 			return false;
 		// pads the number with zeros to be 4 digits
-		String filler = String.format("%04d", Integer.parseUnsignedInt(m.group(3)));
-		this.flightNumber = flightNumber.replace(m.group(3), filler);
+		String filler = String.format("%04d", Integer.parseUnsignedInt(matcher.group(3)));
+		this.flightNumber = flightNumber.replace(matcher.group(3), filler);
 		return true;
 	}
 
