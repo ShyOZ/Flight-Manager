@@ -9,13 +9,13 @@ def run():
 
     @app.route("/")
     def hello():
-        return "hello!"
+        return "404 flights not found"
 
     @app.route("/flightForm", methods=["POST", "GET"])
     def get_info_from_html():
         if request.method == "POST":
             print(["direction-"+request.form["direction"], "outformat-html"] + parse_dictionary(request.form))
-            return ["direction-"+request.form["direction"], "outformat-html"] + parse_dictionary(request.form)
+            return show_java_program_by_args(["direction-"+request.form["direction"], "outformat-html"] + parse_dictionary(request.form))
         else:
             return render_template("FlightForm.html")
 
